@@ -10,12 +10,12 @@ import { NaviBar } from '@/src/core/components/navibar';
 // 3. MOTOR ANALÍTICO DO SCOUTME PRO
 // ==========================================
 
-export function calculateTacticalFit(players, blueprint) {
+export function calculateTacticalFit(players: any, blueprint: any) {
   return players
-    .map((player) => {
+    .map((player: any) => {
       if (!player.atributos) return { ...player, aderenciaTatica: 0 };
 
-      const scoreFit = player.atributos.reduce((acc, attr) => {
+      const scoreFit = player.atributos.reduce((acc: any, attr: any) => {
         let key = attr.subject.toLowerCase();
         if (key.includes('técnica') || key.includes('tecnica')) key = 'tecnica';
         if (key.includes('tática') || key.includes('tatica')) key = 'tatica';
@@ -33,17 +33,17 @@ export function calculateTacticalFit(players, blueprint) {
         aderenciaTatica: Number(scoreFit.toFixed(2)),
       };
     })
-    .sort((a, b) => b.aderenciaTatica - a.aderenciaTatica);
+    .sort((a: any, b: any) => b.aderenciaTatica - a.aderenciaTatica);
 }
 
-function generateComparisonDelta(playerA, playerB) {
+function generateComparisonDelta(playerA: any, playerB: any) {
   if (!playerA || !playerB) return null;
   const attrsA = playerA.atributos || [];
   const attrsB = playerB.atributos || [];
 
-  const attributeDelta = attrsA.map((attrA) => {
+  const attributeDelta = attrsA.map((attrA: any) => {
     const attrB = attrsB.find(
-      (b) => b.subject.toLowerCase() === attrA.subject.toLowerCase()
+      (b: any) => b.subject.toLowerCase() === attrA.subject.toLowerCase()
     ) || { A: 0 };
 
     const diff = Number((attrA.A - attrB.A).toFixed(1));
@@ -67,7 +67,7 @@ function generateComparisonDelta(playerA, playerB) {
   };
 }
 
-function analyzeTagEfficiencyRatio(player) {
+function analyzeTagEfficiencyRatio(player: any) {
   const tags = player?.videoTags || [];
   if (tags.length === 0) {
     return {
@@ -80,7 +80,7 @@ function analyzeTagEfficiencyRatio(player) {
   let acertos = 0;
   let desenvolvimento = 0;
 
-  tags.forEach((tag) => {
+  tags.forEach((tag: any) => {
     const tagStr =
       typeof tag === 'string'
         ? tag.toLowerCase()
@@ -106,7 +106,7 @@ function analyzeTagEfficiencyRatio(player) {
   };
 }
 
-function calculateGrowthVelocity(player) {
+function calculateGrowthVelocity(player: any) {
   const hist = player?.evolucao;
   if (!hist || hist.length < 2) {
     return { velocidadeEvolucao: 0, diagnosticoTendencia: 'Estável' };
@@ -127,11 +127,11 @@ function calculateGrowthVelocity(player) {
 }
 
 function multiCriteriaScoutingRank(
-  playersList,
+  playersList: any,
   weights = { score: 0.4, solidez: 0.2, eficiencia: 0.2, potencial: 0.2 }
 ) {
   return playersList
-    .map((player) => {
+    .map((player: any) => {
       const tagAnalysis = analyzeTagEfficiencyRatio(player);
       const normalizedScore = player.scoreAtual || 0;
       const normalizedSolidez = (player.solidezPct || 0) / 10;
@@ -151,15 +151,15 @@ function multiCriteriaScoutingRank(
         indiceScoutingPro: Number(indiceFinal.toFixed(2)),
       };
     })
-    .sort((a, b) => b.indiceScoutingPro - a.indiceScoutingPro);
+    .sort((a: any, b: any) => b.indiceScoutingPro - a.indiceScoutingPro);
 }
 
 // ==========================================
 // 4. SUBCOMPONENTES DE INTERFACE
 // ==========================================
 
-function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }) {
-  const [blueprint, setBlueprint] = useState({
+function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }: any) {
+  const [blueprint, setBlueprint] = useState<Record<string, number>>({
     tecnica: 0.3,
     tatica: 0.3,
     fisico: 0.2,
@@ -212,7 +212,7 @@ function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }) {
       </div>
 
       <div className="space-y-2">
-        {rankedPlayers.map((player, index) => (
+        {rankedPlayers.map((player: any, index: number) => (
           <div
             key={player.id}
             onClick={() => onSelectTalent(player.id)}
@@ -244,14 +244,14 @@ function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }) {
   );
 }
 
-function HeadToHeadTab({ talents, themeClasses }) {
+function HeadToHeadTab({ talents, themeClasses }: any) {
   const [playerAId, setPlayerAId] = useState(talents[0]?.id || '');
   const [playerBId, setPlayerBId] = useState(
     talents[1]?.id || talents[0]?.id || ''
   );
 
-  const playerA = talents.find((t) => t.id === playerAId);
-  const playerB = talents.find((t) => t.id === playerBId);
+  const playerA = talents.find((t: any) => t.id === playerAId);
+  const playerB = talents.find((t: any) => t.id === playerBId);
   const delta = useMemo(
     () => generateComparisonDelta(playerA, playerB),
     [playerA, playerB]
@@ -271,7 +271,7 @@ function HeadToHeadTab({ talents, themeClasses }) {
             onChange={(e) => setPlayerAId(e.target.value)}
             className={`w-full p-2 border rounded-xl font-bold ${themeClasses.card}`}
           >
-            {talents.map((t) => (
+            {talents.map((t: any) => (
               <option key={t.id} value={t.id}>
                 {t.nome}
               </option>
@@ -289,7 +289,7 @@ function HeadToHeadTab({ talents, themeClasses }) {
             onChange={(e) => setPlayerBId(e.target.value)}
             className={`w-full p-2 border rounded-xl font-bold ${themeClasses.card}`}
           >
-            {talents.map((t) => (
+            {talents.map((t: any) => (
               <option key={t.id} value={t.id}>
                 {t.nome}
               </option>
@@ -312,7 +312,7 @@ function HeadToHeadTab({ talents, themeClasses }) {
           </div>
 
           <div className="space-y-2">
-            {delta.detalhamentoAtributos.map((item, idx) => (
+            {delta.detalhamentoAtributos.map((item: any, idx: number) => (
               <div
                 key={idx}
                 className="flex justify-between items-center text-[11px]"
@@ -348,7 +348,7 @@ function HeadToHeadTab({ talents, themeClasses }) {
   );
 }
 
-function McdmRankTab({ talents, themeClasses }) {
+function McdmRankTab({ talents, themeClasses }: any) {
   const mcdmRank = useMemo(() => multiCriteriaScoutingRank(talents), [talents]);
 
   return (
@@ -357,8 +357,8 @@ function McdmRankTab({ talents, themeClasses }) {
         Ranking Multicritério (Score, Solidez, Eficiência de Tags e Bônus de
         Idade).
       </p>
-      {mcdmRank.map((player, idx) => {
-        const fullPlayer = talents.find((t) => t.id === player.id);
+      {mcdmRank.map((player: any, idx: number) => {
+        const fullPlayer = talents.find((t: any) => t.id === player.id);
         const growth = calculateGrowthVelocity(fullPlayer);
         const tagEff = analyzeTagEfficiencyRatio(fullPlayer);
 
@@ -433,14 +433,14 @@ export default function App() {
   };
 
   // Recálculo seguro com Média Ponderada
-  const handleAddEvaluation = (talentId, ratingsMap, newTagsList) => {
-    setTalents((prevTalents) => {
-      return prevTalents.map((t) => {
+  const handleAddEvaluation = (talentId: any, ratingsMap: any, newTagsList: any) => {
+    setTalents((prevTalents: any) => {
+      return prevTalents.map((t: any) => {
         if (t.id !== talentId) return t;
 
-        const ratingValues = Object.values(ratingsMap);
+        const ratingValues = Object.values(ratingsMap) as number[];
         const avgRating =
-          ratingValues.reduce((a, b) => a + b, 0) / ratingValues.length;
+          ratingValues.reduce((a: number, b: number) => a + b, 0) / ratingValues.length;
         const currentWeight = currentUser.isVerified ? currentUser.peso : 1;
 
         const oldMedia = t.mediaAvaliacoes || t.scoreAtual;
@@ -638,7 +638,7 @@ export default function App() {
               <TacticalBlueprintTab
                 talents={talents}
                 themeClasses={themeClasses}
-                onSelectTalent={(id) => {
+                onSelectTalent={(id: any) => {
                   setSelectedTalentId(id);
                   setCurrentScreen('detalhe');
                 }}
