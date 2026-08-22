@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState } from "react";
 import { MoonIcon, ShieldIcon, SunIcon } from "../../icons";
 import { HeaderProps } from "./type";
 

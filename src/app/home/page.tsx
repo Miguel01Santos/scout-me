@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useState, useMemo } from 'react';
-import styles from './style.module.css'
+import { useState, useMemo } from 'react';
 import { INITIAL_TALENTS, INITIAL_USER } from '@/src/core/mocks';
-import { BarChart2Icon, MoonIcon, PlusIcon, SearchIcon, ShieldIcon, SunIcon, TargetIcon, UsersIcon } from '@/src/core/icons';
+import { PlusIcon, SearchIcon, TargetIcon, } from '@/src/core/icons';
 import { Header } from '@/src/core/components/header';
+import { NaviBar } from '@/src/core/components/navibar';
 
 // ==========================================
 // 3. MOTOR ANALÍTICO DO SCOUTME PRO
@@ -492,41 +492,15 @@ export default function App() {
     <div
       className={`min-h-screen ${themeClasses.bg} font-sans pb-12 transition-colors duration-200`}
     >
-      {/* Script do CDN Tailwind CSS para garantir renderização imediata */}
-
       <div className="max-w-md mx-auto px-4 pt-4 space-y-4">
-        {/* CABEÇALHO */}
-
         <Header
-        user={currentUser}
-        theme={themeClasses}
-        modeTheme={darkMode}
-        onChange={setDarkMode}
+          user={currentUser}
+          theme={themeClasses}
+          modeTheme={darkMode}
+          onChange={setDarkMode}
         />
 
-        {/* NAVEGAÇÃO PRINCIPAL */}
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => setCurrentScreen('ranking')}
-            className={`p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 ${
-              currentScreen === 'ranking'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'border'
-            }`}
-          >
-            <UsersIcon /> <span>Atletas</span>
-          </button>
-          <button
-            onClick={() => setCurrentScreen('comparar')}
-            className={`p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 ${
-              currentScreen === 'comparar'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'border'
-            }`}
-          >
-            <BarChart2Icon /> <span>Comparador</span>
-          </button>
-        </div>
+        <NaviBar screen={currentScreen} setCurrentScreen={setCurrentScreen} />
 
         {/* TELA 1: LISTA / RANKING DE ATLETAS */}
         {currentScreen === 'ranking' && (
