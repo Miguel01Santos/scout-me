@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import styles from './style.module.css'
 import { INITIAL_TALENTS, INITIAL_USER } from '@/src/core/mocks';
 import { BarChart2Icon, MoonIcon, PlusIcon, SearchIcon, ShieldIcon, SunIcon, TargetIcon, UsersIcon } from '@/src/core/icons';
+import { Header } from '@/src/core/components/header';
 
 // ==========================================
 // 3. MOTOR ANALÍTICO DO SCOUTME PRO
@@ -492,31 +493,16 @@ export default function App() {
       className={`min-h-screen ${themeClasses.bg} font-sans pb-12 transition-colors duration-200`}
     >
       {/* Script do CDN Tailwind CSS para garantir renderização imediata */}
-      <script src="https://cdn.tailwindcss.com"></script>
 
       <div className="max-w-md mx-auto px-4 pt-4 space-y-4">
         {/* CABEÇALHO */}
-        <header
-          className={`p-4 border rounded-2xl flex justify-between items-center ${themeClasses.card}`}
-        >
-          <div className="flex items-center space-x-2">
-            <ShieldIcon />
-            <div>
-              <h1 className="font-black text-sm tracking-wide bg-gradient-to-r from-amber-400 to-indigo-500 bg-clip-text text-transparent">
-                ScoutMe PRO
-              </h1>
-              <p className={`text-[10px] ${themeClasses.subText}`}>
-                Perfil: {currentUser.nome} (Peso {currentUser.peso})
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 border rounded-xl hover:opacity-80 transition"
-          >
-            {darkMode ? <SunIcon /> : <MoonIcon />}
-          </button>
-        </header>
+
+        <Header
+        user={currentUser}
+        theme={themeClasses}
+        modeTheme={darkMode}
+        onChange={setDarkMode}
+        />
 
         {/* NAVEGAÇÃO PRINCIPAL */}
         <div className="grid grid-cols-2 gap-2">
