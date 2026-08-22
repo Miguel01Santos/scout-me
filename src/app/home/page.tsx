@@ -2,18 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import styles from './style.module.css'
-
-// ==========================================
-// 1. ÍCONES EMBUTIDOS (SEM DEPENDÊNCIAS EXTERNAS)
-// ==========================================
-const Target = () => <span>🎯</span>;
-const Shield = () => <span>🛡️</span>;
-const Search = () => <span>🔍</span>;
-const Plus = () => <span>➕</span>;
-const Sun = () => <span>☀️</span>;
-const Moon = () => <span>🌙</span>;
-const BarChart2 = () => <span>📊</span>;
-const Users = () => <span>👥</span>;
+import { BarChart2Icon, MoonIcon, PlusIcon, SearchIcon, ShieldIcon, SunIcon, TargetIcon, UsersIcon } from '@/src/core/icons';
 
 // ==========================================
 // 2. DADOS INICIAIS DA APLICAÇÃO
@@ -258,7 +247,7 @@ function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }) {
     <div className="space-y-4">
       <div className={`p-4 border rounded-2xl ${themeClasses.card}`}>
         <h3 className="text-xs font-bold mb-1 flex items-center text-indigo-500">
-          <Target /> <span className="ml-1.5">Blueprint de Perfil Ideal</span>
+          <TargetIcon /> <span className="ml-1.5">Blueprint de Perfil Ideal</span>
         </h3>
         <p className={`text-[11px] ${themeClasses.subText} mb-3`}>
           Ajuste os pesos dos atributos para ranquear a aderência dos atletas ao
@@ -583,7 +572,7 @@ export default function App() {
           className={`p-4 border rounded-2xl flex justify-between items-center ${themeClasses.card}`}
         >
           <div className="flex items-center space-x-2">
-            <Shield />
+            <ShieldIcon />
             <div>
               <h1 className="font-black text-sm tracking-wide bg-gradient-to-r from-amber-400 to-indigo-500 bg-clip-text text-transparent">
                 ScoutMe PRO
@@ -597,7 +586,7 @@ export default function App() {
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 border rounded-xl hover:opacity-80 transition"
           >
-            {darkMode ? <Sun /> : <Moon />}
+            {darkMode ? <SunIcon /> : <MoonIcon />}
           </button>
         </header>
 
@@ -611,7 +600,7 @@ export default function App() {
                 : 'border'
             }`}
           >
-            <Users /> <span>Atletas</span>
+            <UsersIcon /> <span>Atletas</span>
           </button>
           <button
             onClick={() => setCurrentScreen('comparar')}
@@ -621,7 +610,7 @@ export default function App() {
                 : 'border'
             }`}
           >
-            <BarChart2 /> <span>Comparador</span>
+            <BarChart2Icon /> <span>Comparador</span>
           </button>
         </div>
 
@@ -639,7 +628,7 @@ export default function App() {
                   className={`w-full p-2.5 pl-8 text-xs border rounded-xl outline-none ${themeClasses.card}`}
                 />
                 <span className="absolute left-2.5 top-2.5 text-xs text-slate-400">
-                  <Search />
+                  <SearchIcon />
                 </span>
               </div>
 
@@ -858,7 +847,7 @@ export default function App() {
                 }}
                 className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition mt-2 flex items-center justify-center space-x-1"
               >
-                <Plus />{' '}
+                <PlusIcon />{' '}
                 <span>
                   Registrar Avaliação (Peso Olheiro: {currentUser.peso})
                 </span>
