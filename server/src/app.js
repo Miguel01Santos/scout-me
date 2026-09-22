@@ -16,3 +16,5 @@ app.use('/auth', authRouter);
 app.use((request, response) => response.status(404).json({ message: 'Rota não encontrada' }));
 
 app.use(errorHandler);
+
+export default app;

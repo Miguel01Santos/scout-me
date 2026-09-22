@@ -1,10 +1,10 @@
 'use client';
 
-import { MoonIcon, ShieldIcon, SunIcon } from "../../icons";
+import { LogOutIcon, MoonIcon, ShieldIcon, SunIcon } from "../../icons";
 import { HeaderProps } from "./type";
 
 export function Header({
-  user, theme, modeTheme, onChange
+  user, theme, modeTheme, onChange, onLogout
 }: HeaderProps) {
 
   return (
@@ -22,12 +22,21 @@ export function Header({
           </p>
         </div>
       </div>
-      <button
-        onClick={() => onChange(!modeTheme)}
-        className="p-2 border rounded-xl hover:opacity-80 transition"
-      >
-        {modeTheme ? <SunIcon /> : <MoonIcon />}
-      </button>
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={() => onChange(!modeTheme)}
+          className="p-2 border rounded-xl hover:opacity-80 transition"
+        >
+          {modeTheme ? <SunIcon /> : <MoonIcon />}
+        </button>
+        <button
+          onClick={onLogout}
+          title="Sair"
+          className="p-2 border rounded-xl hover:opacity-80 transition"
+        >
+          <LogOutIcon />
+        </button>
+      </div>
     </header>
   )
 }

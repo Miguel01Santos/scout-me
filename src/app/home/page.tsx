@@ -5,6 +5,7 @@ import { INITIAL_TALENTS, INITIAL_USER } from '@/src/core/mocks';
 import { PlusIcon, SearchIcon, TargetIcon, } from '@/src/core/icons';
 import { Header } from '@/src/core/components/header';
 import { NaviBar } from '@/src/core/components/navibar';
+import { useSession } from '@/src/core/auth/use-session';
 
 // ==========================================
 // 3. MOTOR ANALÍTICO DO SCOUTME PRO
@@ -407,7 +408,8 @@ function McdmRankTab({ talents, themeClasses }: any) {
 // ==========================================
 export default function App() {
   const [talents, setTalents] = useState(INITIAL_TALENTS);
-  const [currentUser] = useState(INITIAL_USER);
+  const { user, logout } = useSession();
+  const currentUser = { ...INITIAL_USER, nome: user?.name ?? '' };
   const [currentScreen, setCurrentScreen] = useState('ranking'); // 'ranking', 'comparar', 'detalhe'
   const [activeTab, setActiveTab] = useState('fit'); // 'fit', 'h2h', 'mcdm'
   const [selectedTalentId, setSelectedTalentId] = useState(
@@ -488,6 +490,8 @@ export default function App() {
     });
   }, [talents, filterPosicao, filterPe, searchQuery]);
 
+  if (!user) return null;
+
   return (
     <div
       className={`min-h-screen ${themeClasses.bg} font-sans pb-12 transition-colors duration-200`}
@@ -498,6 +502,7 @@ export default function App() {
           theme={themeClasses}
           modeTheme={darkMode}
           onChange={setDarkMode}
+          onLogout={logout}
         />
 
         <NaviBar screen={currentScreen} setCurrentScreen={setCurrentScreen} />

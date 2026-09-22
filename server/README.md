@@ -21,6 +21,7 @@ O servidor sobe em `http://localhost:3333`.
 | Variável         | Obrigatória | Padrão | Descrição                                |
 | ---------------- | ----------- | ------ | ---------------------------------------- |
 | `DATABASE_URL`   | sim         | —      | String de conexão do PostgreSQL          |
+| `DATABASE_URL_UNPOOLED` | não  | —      | Conexão direta, usada só pelas migrations |
 | `JWT_SECRET`     | sim         | —      | Segredo usado para assinar os tokens     |
 | `JWT_EXPIRES_IN` | não         | `7d`   | Validade do token de acesso              |
 | `PORT`           | não         | `3333` | Porta HTTP                               |
@@ -91,4 +92,49 @@ src/
 npm run migrate:dev     # cria e aplica migration em desenvolvimento
 npm run migrate:deploy  # aplica migrations pendentes em produção
 npm run studio          # abre o Prisma Studio
+```
+
+## Deploy
+
+A API roda na Vercel e o banco fica na Neon. O front é outro deploy, na Netlify.
+
+### Vercel
+
+A Vercel detecta Express sem configuração: ela procura um arquivo em `src/app.js`
+(entre outros caminhos) que exporte o app como *default* — é o que `src/app.js`
+faz. Não existe `vercel.json` nem pasta `api/` aqui, e não é esquecimento.
+
+Ao importar o repositório em vercel.com/new:
+
+| Campo             | Valor    |
+| ----------------- | -------- |
+| Root Directory    | `server` |
+| Production Branch | `master` |
+
+O `postinstall` roda `prisma generate` durante o build. Não há script de build.
+
+Em produção o app vira uma única Vercel Function, então `src/server.js` (o
+`app.listen`) só é usado no desenvolvimento local.
+
+### Neon
+
+A Neon expõe duas strings de conexão para o mesmo banco:
+
+- a **pooled** (tem `-pooler` no host) vai em `DATABASE_URL`, porque cada
+  instância serverless abre conexões curtas e o pooler é quem aguenta isso;
+- a **direct** vai em `DATABASE_URL_UNPOOLED`, porque `prisma migrate` não
+  funciona através do pooler.
+
+Ambas precisam de `?sslmode=require`.
+
+Se `DATABASE_URL_UNPOOLED` não existir, o `prisma.config.js` cai de volta em
+`DATABASE_URL` — é o que faz o desenvolvimento local continuar com uma variável só.
+
+### Aplicando as migrations em produção
+
+As migrations não rodam no build da Vercel. Com a conexão direta da Neon em
+`.env`:
+
+```bash
+npm run migrate:deploy
 ```

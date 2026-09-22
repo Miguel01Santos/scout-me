@@ -6,16 +6,20 @@ if (existsSync('.env')) {
   process.loadEnvFile();
 }
 
+function migrationsUrl() {
+  return process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+}
+
 export default defineConfig({
   schema: path.join('prisma', 'schema.prisma'),
   datasource: {
-    url: process.env.DATABASE_URL,
+    url: migrationsUrl(),
   },
   migrate: {
     async adapter() {
       const { PrismaPg } = await import('@prisma/adapter-pg');
 
-      return new PrismaPg({ connectionString: process.env.DATABASE_URL });
+      return new PrismaPg({ connectionString: migrationsUrl() });
     },
   },
 });

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,7 +24,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
 
     >
-      <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
