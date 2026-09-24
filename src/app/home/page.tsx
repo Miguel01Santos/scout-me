@@ -6,6 +6,7 @@ import { PlusIcon, SearchIcon, TargetIcon, } from '@/src/core/icons';
 import { Header } from '@/src/core/components/header';
 import { NaviBar } from '@/src/core/components/navibar';
 import { useSession } from '@/src/core/auth/use-session';
+import { AvatarComponent } from '@/src/core/library/avatar';
 
 // ==========================================
 // 3. MOTOR ANALÍTICO DO SCOUTME PRO
@@ -494,9 +495,10 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen ${themeClasses.bg} font-sans pb-12 transition-colors duration-200`}
+    className={`min-h-screen ${themeClasses.bg} font-sans pb-12 transition-colors duration-200`}
     >
       <div className="max-w-md mx-auto px-4 pt-4 space-y-4">
+        <AvatarComponent name={"Miguel Proveza"} />
         <Header
           user={currentUser}
           theme={themeClasses}
