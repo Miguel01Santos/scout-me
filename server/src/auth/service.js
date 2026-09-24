@@ -3,17 +3,9 @@ import jsonwebtoken from 'jsonwebtoken';
 import { prismaClient } from '../prisma.js';
 import { env } from '../env.js';
 import { HttpError } from '../http-error.js';
+import { toPublicUser } from '../user/service.js';
 
 const PASSWORD_SALT_ROUNDS = 10;
-
-function toPublicUser(user) {
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    createdAt: user.createdAt,
-  };
-}
 
 function generateAccessToken(user) {
   return jsonwebtoken.sign({ email: user.email }, env.jwtSecret, {
@@ -51,14 +43,4 @@ export async function authenticateUser({ email, password }) {
   }
 
   return { user: toPublicUser(user), accessToken: generateAccessToken(user) };
-}
-
-export async function findUserById(userId) {
-  const user = await prismaClient.user.findUnique({ where: { id: userId } });
-
-  if (!user) {
-    throw new HttpError(404, 'Usuário não encontrado');
-  }
-
-  return toPublicUser(user);
 }

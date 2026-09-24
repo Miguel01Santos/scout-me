@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Avatar, Badge } from "@heroui/react";
 import { UserAvatarProps } from "./type";
 import { getInitials } from "../../utils/get-initials";
-import { ModalComponent } from "../modal";
+import { UserModal } from "../../components/user-modal";
 
 export function AvatarComponent({ name, avatarUrl }: UserAvatarProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +19,7 @@ export function AvatarComponent({ name, avatarUrl }: UserAvatarProps) {
         </Avatar>
       </Badge.Anchor>
 
-      <ModalComponent isOpen={isOpen} onOpenChange={setIsOpen} />
+      <UserModal isOpen={isOpen} onOpenChange={setIsOpen} />
     </>
   );
 }

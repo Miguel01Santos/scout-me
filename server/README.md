@@ -36,7 +36,8 @@ O servidor não sobe se `DATABASE_URL` ou `JWT_SECRET` estiverem ausentes.
 | GET    | `/health`        | não  | Verificação de disponibilidade        |
 | POST   | `/auth/register` | não  | Cria um usuário e devolve o token     |
 | POST   | `/auth/login`    | não  | Autentica e devolve o token           |
-| GET    | `/auth/me`       | sim  | Devolve o usuário dono do token       |
+| GET    | `/user/me`       | sim  | Devolve o usuário dono do token       |
+| PATCH  | `/user/me`       | sim  | Atualiza `name` e/ou `avatarUrl`      |
 
 Rotas autenticadas esperam o cabeçalho `Authorization: Bearer <token>`.
 
@@ -56,6 +57,15 @@ minúsculas) antes de ser gravado.
 ```
 
 `200` devolve `{ user, accessToken }`.
+
+### PATCH /user/me
+
+```json
+{ "name": "Edson Souza", "avatarUrl": "https://exemplo.com/avatar.png" }
+```
+
+Os dois campos são opcionais — manda só o que quiser mudar. `avatarUrl` aceita
+`null` para remover o avatar. `200` devolve `{ user }`.
 
 ## Respostas de erro
 
@@ -79,10 +89,15 @@ src/
 ├── middlewares/
 │   ├── authenticate.js     valida o Bearer token e injeta request.userId
 │   └── error-handler.js    traduz erros em resposta JSON
-└── auth/
+├── auth/
+│   ├── routes.js
+│   ├── controller.js       entrada HTTP
+│   ├── service.js          regras de cadastro e autenticação
+│   └── schema.js           validação do corpo das requisições
+└── user/
     ├── routes.js
     ├── controller.js       entrada HTTP
-    ├── service.js          regras de cadastro e autenticação
+    ├── service.js          leitura e atualização do usuário
     └── schema.js           validação do corpo das requisições
 ```
 

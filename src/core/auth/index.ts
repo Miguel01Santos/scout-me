@@ -12,7 +12,7 @@ export function loginUser(input: LoginInput) {
 }
 
 export function fetchLoggedUser(accessToken: string) {
-  return get<{ user: AuthUser }>('/auth/me', accessToken);
+  return get<{ user: AuthUser }>('/user/me', accessToken);
 }
 
 export function saveSession(session: AuthSession) {

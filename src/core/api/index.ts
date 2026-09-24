@@ -46,3 +46,14 @@ export function get<TResponse>(path: string, accessToken: string) {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
+
+export function patch<TResponse>(path: string, accessToken: string, body: unknown) {
+  return request<TResponse>(path, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(body),
+  });
+}
