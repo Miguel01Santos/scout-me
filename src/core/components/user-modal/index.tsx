@@ -86,9 +86,20 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
           </nav>
         }
         footer={
-          <Button variant="danger-soft" fullWidth onPress={() => setIsLogoutOpen(true)}>
-            Sair
-          </Button>
+          <div className="flex w-full flex-col gap-4">
+            <div className="flex items-center space-x-2">
+              <ShieldIcon />
+              <div>
+                <p className="font-black text-sm tracking-wide bg-gradient-to-r from-amber-400 to-indigo-500 bg-clip-text text-transparent">
+                  ScoutMe PRO
+                </p>
+                <p className="text-[10px] text-slate-400">Scouting de base</p>
+              </div>
+            </div>
+            <Button variant="danger-soft" fullWidth onPress={() => setIsLogoutOpen(true)}>
+              Sair
+            </Button>
+          </div>
         }
       />
 
