@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { Avatar, Badge, Button, Skeleton } from "@heroui/react";
+import { Avatar, Badge, Button, Chip, Skeleton } from "@heroui/react";
 import { ModalComponent } from "../../library/modal";
 import { getInitials } from "../../utils/get-initials";
 import { getSession } from "../../auth";
 import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
+import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
 import { UserModalProps } from "./type";
 
 export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
   const [user, setUser] = useState<User | null>(null);
+  const accountType = toAccountType(user?.account?.type);
 
   async function initialize() {
     const session = getSession();
@@ -53,10 +55,12 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
         )
       }
       body={
-        <p>
-          This is a bottom drawer built with React Modal component. It slides up from
-          the bottom of the screen with a smooth CSS transition.
-        </p>
+        <Button variant="tertiary" fullWidth className="justify-between text-black">
+          Meu plano
+          <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
+            {ACCOUNT_TYPE_NAME[accountType]}
+          </Chip>
+        </Button>
       }
       footer={
         <>

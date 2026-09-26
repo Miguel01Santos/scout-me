@@ -1,8 +1,11 @@
+import { Account } from '../api/account/type';
+
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
   createdAt: string;
+  account?: Account;
 }
 
 export interface AuthSession {

@@ -498,7 +498,7 @@ export default function App() {
     className={`min-h-screen ${themeClasses.bg} font-sans pb-12 transition-colors duration-200`}
     >
       <div className="max-w-md mx-auto px-4 pt-4 space-y-4">
-        <AvatarComponent name={"Miguel Proveza"} />
+        <AvatarComponent name={"Miguel Proveza"} accountType={user?.account?.type} />
         <Header
           user={currentUser}
           theme={themeClasses}
