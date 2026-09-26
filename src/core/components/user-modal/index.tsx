@@ -8,6 +8,7 @@ import { clearSession, getSession } from "../../auth";
 import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
+import { ShieldIcon, UserIcon } from "../../icons";
 import { UserModalProps } from "./type";
 
 const OPTION_CLASS_NAME =
@@ -68,13 +69,23 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
       body={
         <nav className="flex flex-col">
           <button type="button" className={OPTION_CLASS_NAME}>
-            Meu plano
+            <span className="flex items-center gap-3">
+              <span className="brightness-0">
+                <ShieldIcon />
+              </span>
+              Meu plano
+            </span>
             <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
               {ACCOUNT_TYPE_NAME[accountType]}
             </Chip>
           </button>
           <Link href="/account" className={OPTION_CLASS_NAME}>
-            Minha Conta
+            <span className="flex items-center gap-3">
+              <span className="brightness-0">
+                <UserIcon />
+              </span>
+              Minha Conta
+            </span>
           </Link>
         </nav>
       }
