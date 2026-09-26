@@ -6,10 +6,10 @@ export enum AccountType {
 }
 
 export const ACCOUNT_TYPE_NAME: Record<AccountType, string> = {
-  [AccountType.PERSON]: 'Pessoa',
-  [AccountType.TEAM]: 'Time',
-  [AccountType.FEDERATION]: 'Federação',
-  [AccountType.SCOUT]: 'Olheiro',
+  [AccountType.PERSON]: 'Person',
+  [AccountType.TEAM]: 'Team',
+  [AccountType.FEDERATION]: 'Federation',
+  [AccountType.SCOUT]: 'Scout',
 };
 
 export const ACCOUNT_TYPE_COLOR: Record<AccountType, { ring: string; background: string }> = {

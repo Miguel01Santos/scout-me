@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Avatar, Badge, Button, Chip, Skeleton } from "@heroui/react";
 import { ModalComponent } from "../../library/modal";
 import { getInitials } from "../../utils/get-initials";
@@ -7,6 +8,9 @@ import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
 import { UserModalProps } from "./type";
+
+const OPTION_CLASS_NAME =
+  "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-black transition hover:bg-black/5";
 
 export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
   const [user, setUser] = useState<User | null>(null);
@@ -55,12 +59,17 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
         )
       }
       body={
-        <Button variant="tertiary" fullWidth className="justify-between text-black">
-          Meu plano
-          <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
-            {ACCOUNT_TYPE_NAME[accountType]}
-          </Chip>
-        </Button>
+        <nav className="flex flex-col">
+          <button type="button" className={OPTION_CLASS_NAME}>
+            Meu plano
+            <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
+              {ACCOUNT_TYPE_NAME[accountType]}
+            </Chip>
+          </button>
+          <Link href="/account" className={OPTION_CLASS_NAME}>
+            Minha Conta
+          </Link>
+        </nav>
       }
       footer={
         <>
