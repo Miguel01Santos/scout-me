@@ -10,4 +10,3 @@ export const SunIcon = () => <span>☀️</span>;
 export const MoonIcon = () => <span>🌙</span>;
 export const BarChart2Icon = () => <span>📊</span>;
 export const UsersIcon = () => <span>👥</span>;
-export const LogOutIcon = () => <span>🚪</span>;

@@ -409,7 +409,7 @@ function McdmRankTab({ talents, themeClasses }: any) {
 // ==========================================
 export default function App() {
   const [talents, setTalents] = useState(INITIAL_TALENTS);
-  const { user, logout } = useSession();
+  const { user } = useSession();
   const currentUser = { ...INITIAL_USER, nome: user?.name ?? '' };
   const [currentScreen, setCurrentScreen] = useState('ranking'); // 'ranking', 'comparar', 'detalhe'
   const [activeTab, setActiveTab] = useState('fit'); // 'fit', 'h2h', 'mcdm'
@@ -504,7 +504,6 @@ export default function App() {
           theme={themeClasses}
           modeTheme={darkMode}
           onChange={setDarkMode}
-          onLogout={logout}
         />
 
         <NaviBar screen={currentScreen} setCurrentScreen={setCurrentScreen} />

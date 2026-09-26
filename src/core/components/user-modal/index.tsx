@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Avatar, Badge, Chip, Skeleton } from "@heroui/react";
+import { useRouter } from "next/navigation";
+import { Avatar, Badge, Button, Chip, Skeleton } from "@heroui/react";
 import { ModalComponent } from "../../library/modal";
 import { getInitials } from "../../utils/get-initials";
-import { getSession } from "../../auth";
+import { clearSession, getSession } from "../../auth";
 import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
@@ -13,8 +14,14 @@ const OPTION_CLASS_NAME =
   "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-black transition hover:bg-black/5";
 
 export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const accountType = toAccountType(user?.account?.type);
+
+  function logout() {
+    clearSession();
+    router.replace("/login");
+  }
 
   async function initialize() {
     const session = getSession();
@@ -70,6 +77,11 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
             Minha Conta
           </Link>
         </nav>
+      }
+      footer={
+        <Button variant="danger-soft" fullWidth onPress={logout}>
+          Sair
+        </Button>
       }
     />
   );

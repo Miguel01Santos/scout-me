@@ -1,10 +1,10 @@
 'use client';
 
-import { LogOutIcon, MoonIcon, ShieldIcon, SunIcon } from "../../icons";
+import { MoonIcon, ShieldIcon, SunIcon } from "../../icons";
 import { HeaderProps } from "./type";
 
 export function Header({
-  user, theme, modeTheme, onChange, onLogout
+  user, theme, modeTheme, onChange
 }: HeaderProps) {
 
   return (
@@ -28,13 +28,6 @@ export function Header({
           className="p-2 border rounded-xl hover:opacity-80 transition"
         >
           {modeTheme ? <SunIcon /> : <MoonIcon />}
-        </button>
-        <button
-          onClick={onLogout}
-          title="Sair"
-          className="p-2 border rounded-xl hover:opacity-80 transition"
-        >
-          <LogOutIcon />
         </button>
       </div>
     </header>

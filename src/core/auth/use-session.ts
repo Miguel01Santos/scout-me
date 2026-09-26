@@ -44,10 +44,5 @@ export function useSession() {
       });
   }, [router]);
 
-  function logout() {
-    clearSession();
-    router.replace('/login');
-  }
-
-  return { user, logout };
+  return { user };
 }

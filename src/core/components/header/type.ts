@@ -13,5 +13,4 @@ export interface HeaderProps {
   theme: theme;
   modeTheme: boolean;
   onChange: (darkMode: boolean) => void;
-  onLogout: () => void;
 }
