@@ -5,5 +5,5 @@ export interface ModalComponentProps {
   onOpenChange: (isOpen: boolean) => void;
   header: ReactNode;
   body: ReactNode;
-  footer: ReactNode;
+  footer?: ReactNode;
 }

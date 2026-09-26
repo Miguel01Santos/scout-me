@@ -18,7 +18,7 @@ export function ModalComponent({
             </Drawer.Header>
             <Separator className="my-4" />
             <Drawer.Body>{body}</Drawer.Body>
-            <Drawer.Footer>{footer}</Drawer.Footer>
+            {footer && <Drawer.Footer>{footer}</Drawer.Footer>}
           </Drawer.Dialog>
         </Drawer.Content>
       </Drawer.Backdrop>

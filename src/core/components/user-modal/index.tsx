@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Avatar, Badge, Button, Chip, Skeleton } from "@heroui/react";
+import { Avatar, Badge, Chip, Skeleton } from "@heroui/react";
 import { ModalComponent } from "../../library/modal";
 import { getInitials } from "../../utils/get-initials";
 import { getSession } from "../../auth";
@@ -70,14 +70,6 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
             Minha Conta
           </Link>
         </nav>
-      }
-      footer={
-        <>
-          <Button slot="close" variant="secondary">
-            Cancel
-          </Button>
-          <Button slot="close">Confirm</Button>
-        </>
       }
     />
   );
