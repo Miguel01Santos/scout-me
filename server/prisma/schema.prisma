@@ -16,5 +16,32 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  accounts Account[]
+
   @@map("user")
+}
+
+model Account {
+  id     Int    @id @default(autoincrement())
+  userId String @map("user_id")
+  type   String
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  configuration Configuration?
+
+  @@map("account")
+}
+
+model Configuration {
+  accountId     Int     @id @map("account_id")
+  theme         String  @default("light")
+  language      String  @default("pt")
+  notifications Boolean @default(true)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("configuration")
 }

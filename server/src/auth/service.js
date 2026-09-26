@@ -4,6 +4,7 @@ import { prismaClient } from '../prisma.js';
 import { env } from '../env.js';
 import { HttpError } from '../http-error.js';
 import { toPublicUser } from '../user/service.js';
+import { AccountType } from '../account/constants.js';
 
 const PASSWORD_SALT_ROUNDS = 10;
 
@@ -23,7 +24,14 @@ export async function registerUser({ name, email, password }) {
 
   const hashedPassword = await bcryptjs.hash(password, PASSWORD_SALT_ROUNDS);
   const user = await prismaClient.user.create({
-    data: { name, email, password: hashedPassword },
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+      accounts: {
+        create: { type: AccountType.PERSON, configuration: { create: {} } },
+      },
+    },
   });
 
   return { user: toPublicUser(user), accessToken: generateAccessToken(user) };

@@ -48,7 +48,8 @@ Rotas autenticadas esperam o cabeçalho `Authorization: Bearer <token>`.
 ```
 
 `201` devolve `{ user, accessToken }`. O e-mail é normalizado (sem espaços e em
-minúsculas) antes de ser gravado.
+minúsculas) antes de ser gravado. Junto com o usuário é criada uma conta do tipo
+`person` com a configuração padrão (`light`, `pt`, notificações ligadas).
 
 ### POST /auth/login
 
@@ -94,6 +95,10 @@ src/
 │   ├── controller.js       entrada HTTP
 │   ├── service.js          regras de cadastro e autenticação
 │   └── schema.js           validação do corpo das requisições
+├── account/
+│   └── constants.js        tipos de conta (person, team, federation, scout)
+├── configuration/
+│   └── constants.js        valores de tema e idioma
 └── user/
     ├── routes.js
     ├── controller.js       entrada HTTP
@@ -126,7 +131,8 @@ Ao importar o repositório em vercel.com/new:
 | Root Directory    | `server` |
 | Production Branch | `master` |
 
-O `postinstall` roda `prisma generate` durante o build. Não há script de build.
+O `postinstall` roda `prisma generate` durante o build, e o `vercel-build` aplica
+as migrations (ver abaixo).
 
 Em produção o app vira uma única Vercel Function, então `src/server.js` (o
 `app.listen`) só é usado no desenvolvimento local.
@@ -147,8 +153,16 @@ Se `DATABASE_URL_UNPOOLED` não existir, o `prisma.config.js` cai de volta em
 
 ### Aplicando as migrations em produção
 
-As migrations não rodam no build da Vercel. Com a conexão direta da Neon em
-`.env`:
+Todo deploy de produção (push na `master`) roda o script `vercel-build`, que
+executa `prisma migrate deploy` na Neon antes de publicar a função. Se a
+migration falhar, o build falha e a versão anterior continua no ar. Deploys de
+preview pulam esse passo para não migrar o banco de produção a partir de outra
+branch.
+
+Para isso, `DATABASE_URL_UNPOOLED` precisa estar cadastrada nas variáveis de
+ambiente de produção da Vercel.
+
+Para aplicar na mão, com a conexão direta da Neon em `.env`:
 
 ```bash
 npm run migrate:deploy
