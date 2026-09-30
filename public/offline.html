@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#020617" />
+    <title>ScoutMe PRO · Sem conexão</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        box-sizing: border-box;
+        background: #020617;
+        color: #f1f5f9;
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+        text-align: center;
+      }
+
+      main {
+        max-width: 320px;
+      }
+
+      img {
+        width: 72px;
+        height: 72px;
+      }
+
+      h1 {
+        font-size: 18px;
+        margin: 16px 0 4px;
+      }
+
+      p {
+        font-size: 13px;
+        color: #94a3b8;
+        margin: 0 0 20px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 10px 20px;
+        background: #4f46e5;
+        color: #fff;
+        font-weight: 700;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icons/icon-192.png" alt="" />
+      <h1>Você está sem conexão</h1>
+      <p>Assim que a internet voltar, o ScoutMe PRO carrega normalmente.</p>
+      <button type="button" onclick="location.reload()">Tentar de novo</button>
+    </main>
+  </body>
+</html>
