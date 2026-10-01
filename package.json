@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "start:dev": "next dev",
+    "start:server": "concurrently -n web,api -c cyan,green \"npm run start:dev\" \"npm --prefix server run start:dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -23,6 +24,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.5.4",
+    "concurrently": "^10.0.5",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
     "postcss": "^8.5.26",
