@@ -6,4 +6,5 @@ export interface DialogComponentProps {
   title: string;
   body: ReactNode;
   footer: ReactNode;
+  className?: string;
 }

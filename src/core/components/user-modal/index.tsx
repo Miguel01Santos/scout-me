@@ -9,15 +9,17 @@ import { getSession } from "../../auth";
 import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
+import { useThemeClasses } from "../../hooks/use-theme-classes";
 import { ShieldIcon } from "../../icons";
 import { DialogLogout } from "../dialog-logout";
 import { UserModalProps } from "./type";
 
 const OPTION_CLASS_NAME =
-  "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-black transition hover:bg-black/5";
+  "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-default";
 
 export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
   const router = useRouter();
+  const themeClasses = useThemeClasses();
   const [user, setUser] = useState<User | null>(null);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const accountType = toAccountType(user?.account?.type);
@@ -47,6 +49,7 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
       <ModalComponent
         isOpen={isOpen}
         onOpenChange={onOpenChange}
+        className={themeClasses.bg}
         header={
           !user ? (
             <>
@@ -67,7 +70,7 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
               </Badge.Anchor>
               <div>
                 <h2 className="text-lg font-semibold">{user.name}</h2>
-                <p className="text-xs text-black/50">Meu perfil</p>
+                <p className="text-xs text-muted">Meu perfil</p>
               </div>
             </Link>
           )

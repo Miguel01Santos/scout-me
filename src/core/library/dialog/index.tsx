@@ -7,12 +7,13 @@ export function DialogComponent({
   title,
   body,
   footer,
+  className,
 }: DialogComponentProps) {
   return (
     <AlertDialog isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Backdrop>
         <AlertDialog.Container>
-          <AlertDialog.Dialog>
+          <AlertDialog.Dialog className={className}>
             <AlertDialog.Header>
               <AlertDialog.Heading>{title}</AlertDialog.Heading>
             </AlertDialog.Header>

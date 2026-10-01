@@ -15,12 +15,13 @@ export function ModalComponent({
   header,
   body,
   footer,
+  className,
 }: ModalComponentProps) {
   return (
     <Drawer isOpen={isOpen} onOpenChange={onOpenChange}>
       <Drawer.Backdrop className="data-[exiting=true]:duration-500">
         <Drawer.Content placement="left">
-          <Drawer.Dialog style={EXIT_ANIMATION_STYLE}>
+          <Drawer.Dialog style={EXIT_ANIMATION_STYLE} className={className}>
             <Drawer.Header className="flex flex-row items-center space-x-1">
               {header}
             </Drawer.Header>

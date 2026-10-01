@@ -6,4 +6,5 @@ export interface ModalComponentProps {
   header: ReactNode;
   body: ReactNode;
   footer?: ReactNode;
+  className?: string;
 }
