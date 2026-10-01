@@ -1,4 +1,4 @@
-import { BarChart2Icon, UsersIcon } from "../../icons";
+import { ChartColumn, Users } from "lucide-react";
 import { NaviBarProps } from "./type";
 
 export function NaviBar({ screen, setCurrentScreen }: NaviBarProps) {
@@ -12,7 +12,7 @@ export function NaviBar({ screen, setCurrentScreen }: NaviBarProps) {
             : 'border'
         }`}
       >
-        <UsersIcon /> <span>Atletas</span>
+        <Users size={14} /> <span>Atletas</span>
       </button>
       <button
         onClick={() => setCurrentScreen('comparar')}
@@ -22,7 +22,7 @@ export function NaviBar({ screen, setCurrentScreen }: NaviBarProps) {
             : 'border'
         }`}
       >
-        <BarChart2Icon /> <span>Comparador</span>
+        <ChartColumn size={14} /> <span>Comparador</span>
       </button>
     </div>
   )

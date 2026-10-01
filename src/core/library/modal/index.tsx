@@ -1,5 +1,9 @@
+import { CSSProperties } from "react";
 import { Drawer, Separator } from "@heroui/react";
 import { ModalComponentProps } from "./type";
+
+// Fechamento mais lento que o padrão do HeroUI (200ms).
+const EXIT_ANIMATION_STYLE = { '--drawer-exit-duration': '500ms' } as CSSProperties;
 
 export function ModalComponent({
   isOpen,
@@ -10,9 +14,9 @@ export function ModalComponent({
 }: ModalComponentProps) {
   return (
     <Drawer isOpen={isOpen} onOpenChange={onOpenChange}>
-      <Drawer.Backdrop>
+      <Drawer.Backdrop className="data-[exiting=true]:duration-500">
         <Drawer.Content placement="left">
-          <Drawer.Dialog>
+          <Drawer.Dialog style={EXIT_ANIMATION_STYLE}>
             <Drawer.Header className="flex flex-row items-center space-x-1">
               {header}
             </Drawer.Header>

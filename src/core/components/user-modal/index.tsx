@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Settings, ShieldCheck } from "lucide-react";
 import { Avatar, Badge, Button, Chip, Skeleton } from "@heroui/react";
 import { ModalComponent } from "../../library/modal";
 import { getInitials } from "../../utils/get-initials";
@@ -7,7 +8,7 @@ import { getSession } from "../../auth";
 import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
-import { ShieldIcon, UserIcon } from "../../icons";
+import { ShieldIcon } from "../../icons";
 import { DialogLogout } from "../dialog-logout";
 import { UserModalProps } from "./type";
 
@@ -60,21 +61,21 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
           <nav className="flex flex-col">
             <button type="button" className={OPTION_CLASS_NAME}>
               <span className="flex items-center gap-3">
-                <span className="brightness-0">
-                  <ShieldIcon />
-                </span>
+                <ShieldCheck size={18} />
                 Meu plano
               </span>
               <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
                 {ACCOUNT_TYPE_NAME[accountType]}
               </Chip>
             </button>
-            <Link href="/account" className={OPTION_CLASS_NAME}>
+            <Link
+              href="/configuracoes-e-privacidade"
+              className={OPTION_CLASS_NAME}
+              onClick={() => onOpenChange(false)}
+            >
               <span className="flex items-center gap-3">
-                <span className="brightness-0">
-                  <UserIcon />
-                </span>
-                Minha Conta
+                <Settings size={18} />
+                Configurações e privacidade
               </span>
             </Link>
           </nav>

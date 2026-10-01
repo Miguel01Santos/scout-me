@@ -3,10 +3,10 @@
 import { useState, useMemo } from 'react';
 import { INITIAL_TALENTS, INITIAL_USER } from '@/src/core/mocks';
 import { Talent } from '@/src/core/mocks/type';
-import { MoonIcon, PlusIcon, SearchIcon, SunIcon, TargetIcon, } from '@/src/core/icons';
+import { PlusIcon, SearchIcon, TargetIcon, } from '@/src/core/icons';
+import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
 import { NaviBar } from '@/src/core/components/navibar';
 import { useSession } from '@/src/core/auth/use-session';
-import { AvatarComponent } from '@/src/core/library/avatar';
 import { Blueprint, TabProps, TacticalBlueprintTabProps } from './type';
 
 // ==========================================
@@ -417,7 +417,6 @@ export default function App() {
   const [selectedTalentId, setSelectedTalentId] = useState(
     INITIAL_TALENTS[0].id
   );
-  const [darkMode, setDarkMode] = useState(true);
 
   // Filtros de Busca
   const [filterPosicao, setFilterPosicao] = useState('Todas');
@@ -427,14 +426,7 @@ export default function App() {
   const selectedTalent =
     talents.find((t) => t.id === selectedTalentId) || talents[0];
 
-  const themeClasses = {
-    bg: darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900',
-    card: darkMode
-      ? 'bg-slate-900/90 border-slate-800'
-      : 'bg-white border-slate-200 shadow-sm',
-    cardHover: darkMode ? 'hover:border-slate-700' : 'hover:border-slate-300',
-    subText: darkMode ? 'text-slate-400' : 'text-slate-500',
-  };
+  const themeClasses = useThemeClasses();
 
   // Recálculo seguro com Média Ponderada
   const handleAddEvaluation = (
@@ -499,20 +491,8 @@ export default function App() {
   if (!user) return null;
 
   return (
-    <div
-    className={`min-h-screen ${themeClasses.bg} font-sans pb-12 transition-colors duration-200`}
-    >
+    <div className="pb-12">
       <div className="max-w-md mx-auto px-4 pt-4 space-y-4">
-        <div className="flex items-center gap-3">
-          <AvatarComponent name={"Miguel Proveza"} accountType={user?.account?.type} />
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 border rounded-xl hover:opacity-80 transition"
-          >
-            {darkMode ? <SunIcon /> : <MoonIcon />}
-          </button>
-        </div>
-
         <NaviBar screen={currentScreen} setCurrentScreen={setCurrentScreen} />
 
         {/* TELA 1: LISTA / RANKING DE ATLETAS */}

@@ -38,6 +38,8 @@ O servidor não sobe se `DATABASE_URL` ou `JWT_SECRET` estiverem ausentes.
 | POST   | `/auth/login`    | não  | Autentica e devolve o token           |
 | GET    | `/user/me`       | sim  | Devolve o usuário dono do token       |
 | PATCH  | `/user/me`       | sim  | Atualiza `name` e/ou `avatarUrl`      |
+| GET    | `/account/me`    | sim  | Devolve a conta e a configuração      |
+| PATCH  | `/account/me/configuration` | sim | Atualiza `theme`, `language` e/ou `notifications` |
 
 Rotas autenticadas esperam o cabeçalho `Authorization: Bearer <token>`.
 
