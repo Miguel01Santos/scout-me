@@ -2,21 +2,23 @@
 
 import { useState, useMemo } from 'react';
 import { INITIAL_TALENTS, INITIAL_USER } from '@/src/core/mocks';
+import { Talent } from '@/src/core/mocks/type';
 import { MoonIcon, PlusIcon, SearchIcon, SunIcon, TargetIcon, } from '@/src/core/icons';
 import { NaviBar } from '@/src/core/components/navibar';
 import { useSession } from '@/src/core/auth/use-session';
 import { AvatarComponent } from '@/src/core/library/avatar';
+import { Blueprint, TabProps, TacticalBlueprintTabProps } from './type';
 
 // ==========================================
 // 3. MOTOR ANALÍTICO DO SCOUTME PRO
 // ==========================================
 
-export function calculateTacticalFit(players: any, blueprint: any) {
+export function calculateTacticalFit(players: Talent[], blueprint: Blueprint) {
   return players
-    .map((player: any) => {
+    .map((player) => {
       if (!player.atributos) return { ...player, aderenciaTatica: 0 };
 
-      const scoreFit = player.atributos.reduce((acc: any, attr: any) => {
+      const scoreFit = player.atributos.reduce((acc, attr) => {
         let key = attr.subject.toLowerCase();
         if (key.includes('técnica') || key.includes('tecnica')) key = 'tecnica';
         if (key.includes('tática') || key.includes('tatica')) key = 'tatica';
@@ -34,17 +36,17 @@ export function calculateTacticalFit(players: any, blueprint: any) {
         aderenciaTatica: Number(scoreFit.toFixed(2)),
       };
     })
-    .sort((a: any, b: any) => b.aderenciaTatica - a.aderenciaTatica);
+    .sort((a, b) => b.aderenciaTatica - a.aderenciaTatica);
 }
 
-function generateComparisonDelta(playerA: any, playerB: any) {
+function generateComparisonDelta(playerA?: Talent, playerB?: Talent) {
   if (!playerA || !playerB) return null;
   const attrsA = playerA.atributos || [];
   const attrsB = playerB.atributos || [];
 
-  const attributeDelta = attrsA.map((attrA: any) => {
+  const attributeDelta = attrsA.map((attrA) => {
     const attrB = attrsB.find(
-      (b: any) => b.subject.toLowerCase() === attrA.subject.toLowerCase()
+      (b) => b.subject.toLowerCase() === attrA.subject.toLowerCase()
     ) || { A: 0 };
 
     const diff = Number((attrA.A - attrB.A).toFixed(1));
@@ -68,9 +70,9 @@ function generateComparisonDelta(playerA: any, playerB: any) {
   };
 }
 
-function analyzeTagEfficiencyRatio(player: any) {
+function analyzeTagEfficiencyRatio(player?: Talent) {
   const tags = player?.videoTags || [];
-  if (tags.length === 0) {
+  if (!player || tags.length === 0) {
     return {
       nome: player?.nome || '',
       totalLancesAnalisados: 0,
@@ -81,7 +83,7 @@ function analyzeTagEfficiencyRatio(player: any) {
   let acertos = 0;
   let desenvolvimento = 0;
 
-  tags.forEach((tag: any) => {
+  tags.forEach((tag) => {
     const tagStr =
       typeof tag === 'string'
         ? tag.toLowerCase()
@@ -107,7 +109,7 @@ function analyzeTagEfficiencyRatio(player: any) {
   };
 }
 
-function calculateGrowthVelocity(player: any) {
+function calculateGrowthVelocity(player?: Talent) {
   const hist = player?.evolucao;
   if (!hist || hist.length < 2) {
     return { velocidadeEvolucao: 0, diagnosticoTendencia: 'Estável' };
@@ -128,11 +130,11 @@ function calculateGrowthVelocity(player: any) {
 }
 
 function multiCriteriaScoutingRank(
-  playersList: any,
+  playersList: Talent[],
   weights = { score: 0.4, solidez: 0.2, eficiencia: 0.2, potencial: 0.2 }
 ) {
   return playersList
-    .map((player: any) => {
+    .map((player) => {
       const tagAnalysis = analyzeTagEfficiencyRatio(player);
       const normalizedScore = player.scoreAtual || 0;
       const normalizedSolidez = (player.solidezPct || 0) / 10;
@@ -152,15 +154,15 @@ function multiCriteriaScoutingRank(
         indiceScoutingPro: Number(indiceFinal.toFixed(2)),
       };
     })
-    .sort((a: any, b: any) => b.indiceScoutingPro - a.indiceScoutingPro);
+    .sort((a, b) => b.indiceScoutingPro - a.indiceScoutingPro);
 }
 
 // ==========================================
 // 4. SUBCOMPONENTES DE INTERFACE
 // ==========================================
 
-function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }: any) {
-  const [blueprint, setBlueprint] = useState<Record<string, number>>({
+function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }: TacticalBlueprintTabProps) {
+  const [blueprint, setBlueprint] = useState<Blueprint>({
     tecnica: 0.3,
     tatica: 0.3,
     fisico: 0.2,
@@ -213,7 +215,7 @@ function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }: any) {
       </div>
 
       <div className="space-y-2">
-        {rankedPlayers.map((player: any, index: number) => (
+        {rankedPlayers.map((player, index) => (
           <div
             key={player.id}
             onClick={() => onSelectTalent(player.id)}
@@ -245,14 +247,14 @@ function TacticalBlueprintTab({ talents, themeClasses, onSelectTalent }: any) {
   );
 }
 
-function HeadToHeadTab({ talents, themeClasses }: any) {
+function HeadToHeadTab({ talents, themeClasses }: TabProps) {
   const [playerAId, setPlayerAId] = useState(talents[0]?.id || '');
   const [playerBId, setPlayerBId] = useState(
     talents[1]?.id || talents[0]?.id || ''
   );
 
-  const playerA = talents.find((t: any) => t.id === playerAId);
-  const playerB = talents.find((t: any) => t.id === playerBId);
+  const playerA = talents.find((t) => t.id === playerAId);
+  const playerB = talents.find((t) => t.id === playerBId);
   const delta = useMemo(
     () => generateComparisonDelta(playerA, playerB),
     [playerA, playerB]
@@ -272,7 +274,7 @@ function HeadToHeadTab({ talents, themeClasses }: any) {
             onChange={(e) => setPlayerAId(e.target.value)}
             className={`w-full p-2 border rounded-xl font-bold ${themeClasses.card}`}
           >
-            {talents.map((t: any) => (
+            {talents.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.nome}
               </option>
@@ -290,7 +292,7 @@ function HeadToHeadTab({ talents, themeClasses }: any) {
             onChange={(e) => setPlayerBId(e.target.value)}
             className={`w-full p-2 border rounded-xl font-bold ${themeClasses.card}`}
           >
-            {talents.map((t: any) => (
+            {talents.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.nome}
               </option>
@@ -313,7 +315,7 @@ function HeadToHeadTab({ talents, themeClasses }: any) {
           </div>
 
           <div className="space-y-2">
-            {delta.detalhamentoAtributos.map((item: any, idx: number) => (
+            {delta.detalhamentoAtributos.map((item, idx) => (
               <div
                 key={idx}
                 className="flex justify-between items-center text-[11px]"
@@ -349,7 +351,7 @@ function HeadToHeadTab({ talents, themeClasses }: any) {
   );
 }
 
-function McdmRankTab({ talents, themeClasses }: any) {
+function McdmRankTab({ talents, themeClasses }: TabProps) {
   const mcdmRank = useMemo(() => multiCriteriaScoutingRank(talents), [talents]);
 
   return (
@@ -358,8 +360,8 @@ function McdmRankTab({ talents, themeClasses }: any) {
         Ranking Multicritério (Score, Solidez, Eficiência de Tags e Bônus de
         Idade).
       </p>
-      {mcdmRank.map((player: any, idx: number) => {
-        const fullPlayer = talents.find((t: any) => t.id === player.id);
+      {mcdmRank.map((player, idx) => {
+        const fullPlayer = talents.find((t) => t.id === player.id);
         const growth = calculateGrowthVelocity(fullPlayer);
         const tagEff = analyzeTagEfficiencyRatio(fullPlayer);
 
@@ -435,9 +437,13 @@ export default function App() {
   };
 
   // Recálculo seguro com Média Ponderada
-  const handleAddEvaluation = (talentId: any, ratingsMap: any, newTagsList: any) => {
-    setTalents((prevTalents: any) => {
-      return prevTalents.map((t: any) => {
+  const handleAddEvaluation = (
+    talentId: string,
+    ratingsMap: Record<string, number>,
+    newTagsList: string[]
+  ) => {
+    setTalents((prevTalents) => {
+      return prevTalents.map((t) => {
         if (t.id !== talentId) return t;
 
         const ratingValues = Object.values(ratingsMap) as number[];
@@ -645,7 +651,7 @@ export default function App() {
               <TacticalBlueprintTab
                 talents={talents}
                 themeClasses={themeClasses}
-                onSelectTalent={(id: any) => {
+                onSelectTalent={(id) => {
                   setSelectedTalentId(id);
                   setCurrentScreen('detalhe');
                 }}

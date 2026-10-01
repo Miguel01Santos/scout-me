@@ -1,0 +1,84 @@
+name: CI
+
+# Fluxo: push em qualquer branch só valida. Quando a branch é mergeada na
+# master pelo GitHub, a CI da master valida de novo e, se passar, publica.
+on:
+  push:
+  workflow_dispatch:
+
+# Em branches de trabalho, um push novo cancela a execução antiga. Na master
+# nada é cancelado, para não interromper um deploy no meio.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  validate:
+    name: Install, lint e build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Configurar Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      # `npm ci` é o `npm install` de CI: instala exatamente o que está no
+      # package-lock.json e falha se ele estiver fora de sincronia.
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy no Netlify
+    # Só roda na master e só depois que a validação passar.
+    needs: validate
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: Production
+
+    steps:
+      - name: Conferir secrets do Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "::error::Cadastre os secrets NETLIFY_AUTH_TOKEN e NETLIFY_SITE_ID no repositório."
+            exit 1
+          fi
+
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Configurar Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # A CLI roda o build com o plugin do Next e as variáveis de ambiente
+      # configuradas no site do Netlify, e publica em produção.
+      - name: Publicar em produção
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: >
+          npx --yes netlify-cli@27 deploy --prod
+          --site "$NETLIFY_SITE_ID"
+          --auth "$NETLIFY_AUTH_TOKEN"
+          --message "CI ${GITHUB_SHA::7}"

@@ -20,18 +20,19 @@ export function useSession() {
     const isLocalhost = window.location.hostname === 'localhost';
     const session = getSession();
 
-    if (!session) {
-      if (isLocalhost) {
-        setUser(LOCAL_DEV_USER);
-        return;
-      }
-
+    if (!session && !isLocalhost) {
       router.replace('/login');
       return;
     }
 
-    fetchLoggedUser(session.accessToken)
-      .then((response) => setUser(response.user))
+    // Sem sessão em localhost entra com o usuário de dev; o usuário sempre
+    // chega por promise para não chamar setState direto no corpo do effect.
+    const loadUser = session
+      ? fetchLoggedUser(session.accessToken).then((response) => response.user)
+      : Promise.resolve(LOCAL_DEV_USER);
+
+    loadUser
+      .then((loadedUser) => setUser(loadedUser))
       .catch(() => {
         clearSession();
 

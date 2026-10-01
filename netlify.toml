@@ -1,6 +1,8 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  # Os builds automáticos do Netlify ficam parados: quem publica é a CI do
+  # GitHub (.github/workflows/ci.yml), só na master e só se a validação passar.
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

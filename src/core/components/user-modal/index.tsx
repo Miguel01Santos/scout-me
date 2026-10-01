@@ -19,22 +19,16 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const accountType = toAccountType(user?.account?.type);
 
-  async function initialize() {
+  useEffect(() => {
+    if (!isOpen) return;
+
     const session = getSession();
 
     if (!session) return;
 
-    try {
-      const { user: fetchedUser } = await getUser(session.accessToken);
-
-      setUser(fetchedUser);
-    } catch {
-      setUser(null);
-    }
-  }
-
-  useEffect(() => {
-    if (isOpen) initialize();
+    getUser(session.accessToken)
+      .then(({ user: fetchedUser }) => setUser(fetchedUser))
+      .catch(() => setUser(null));
   }, [isOpen]);
 
   return (

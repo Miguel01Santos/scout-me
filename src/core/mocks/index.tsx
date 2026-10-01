@@ -2,7 +2,9 @@
 // DADOS INICIAIS DA APLICAÇÃO (Mocks)
 // ==========================================
 // Devemos consumir esses dados via API
-export const INITIAL_TALENTS = [
+import { ScoutUser, Talent } from './type';
+
+export const INITIAL_TALENTS: Talent[] = [
   {
     id: 't1',
     nome: 'Gabriel Jesus Silva',
@@ -65,7 +67,7 @@ export const INITIAL_TALENTS = [
   },
 ];
 
-export const INITIAL_USER = {
+export const INITIAL_USER: ScoutUser = {
   nome: 'Edson Souza',
   role: 'Expert',
   peso: 3,
