@@ -14,7 +14,7 @@ export function AvatarComponent({ name, avatarUrl, accountType }: UserAvatarProp
         onClick={() => setIsOpen(true)}
         className={`ring-2 ${ACCOUNT_TYPE_COLOR[toAccountType(accountType)].ring} rounded-full cursor-pointer`}
       >
-        <Avatar>
+        <Avatar className="size-[35px] text-xs">
           <Avatar.Image alt={name} src={avatarUrl} />
           <Avatar.Fallback>{getInitials(name)}</Avatar.Fallback>
         </Avatar>

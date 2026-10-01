@@ -44,7 +44,11 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
               <Skeleton className="h-4 w-32" />
             </>
           ) : (
-            <>
+            <Link
+              href="/perfil"
+              onClick={() => onOpenChange(false)}
+              className="flex items-center gap-3"
+            >
               <Badge.Anchor>
                 <Avatar>
                   <Avatar.Image alt={user.name} src={user.avatarUrl ?? undefined} />
@@ -53,8 +57,9 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
               </Badge.Anchor>
               <div>
                 <h2 className="text-lg font-semibold">{user.name}</h2>
+                <p className="text-xs text-black/50">Meu perfil</p>
               </div>
-            </>
+            </Link>
           )
         }
         body={
