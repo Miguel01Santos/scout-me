@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Settings, ShieldCheck } from "lucide-react";
 import { Avatar, Badge, Button, Chip, Skeleton } from "@heroui/react";
-import { ModalComponent } from "../../library/modal";
+import { DRAWER_EXIT_DURATION_MS, ModalComponent } from "../../library/modal";
 import { getInitials } from "../../utils/get-initials";
 import { getSession } from "../../auth";
 import { getUser } from "../../api/user/service";
@@ -16,9 +17,18 @@ const OPTION_CLASS_NAME =
   "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-black transition hover:bg-black/5";
 
 export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const accountType = toAccountType(user?.account?.type);
+
+  // Navegar na hora desmontaria o menu (o header some em algumas rotas) sem a animação
+  // de saída; por isso fecha primeiro e só navega quando o menu terminou de sair.
+  function navigateAfterClose(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    event.preventDefault();
+    onOpenChange(false);
+    setTimeout(() => router.push(href), DRAWER_EXIT_DURATION_MS);
+  }
 
   useEffect(() => {
     if (!isOpen) return;
@@ -46,7 +56,7 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
           ) : (
             <Link
               href="/perfil"
-              onClick={() => onOpenChange(false)}
+              onClick={(event) => navigateAfterClose(event, "/perfil")}
               className="flex items-center gap-3"
             >
               <Badge.Anchor>
@@ -76,7 +86,7 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
             <Link
               href="/configuracoes-e-privacidade"
               className={OPTION_CLASS_NAME}
-              onClick={() => onOpenChange(false)}
+              onClick={(event) => navigateAfterClose(event, "/configuracoes-e-privacidade")}
             >
               <span className="flex items-center gap-3">
                 <Settings size={18} />
