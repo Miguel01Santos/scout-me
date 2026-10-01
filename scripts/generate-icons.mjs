@@ -34,10 +34,43 @@ function png(svg, size, path) {
   return sharp(Buffer.from(svg)).resize(size, size).png().toFile(path);
 }
 
+// O sharp não grava .ico, então o arquivo é montado na mão: cabeçalho, uma
+// entrada de 16 bytes por tamanho e as imagens PNG em seguida.
+async function ico(svg, sizes, path) {
+  const images = await Promise.all(
+    sizes.map((size) => sharp(Buffer.from(svg)).resize(size, size).png().toBuffer())
+  );
+
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // reservado
+  header.writeUInt16LE(1, 2); // tipo: ícone
+  header.writeUInt16LE(images.length, 4);
+
+  let offset = header.length + images.length * 16;
+  const entries = images.map((image, index) => {
+    const entry = Buffer.alloc(16);
+    entry.writeUInt8(sizes[index] % 256, 0); // largura (0 significa 256)
+    entry.writeUInt8(sizes[index] % 256, 1); // altura
+    entry.writeUInt16LE(1, 4); // planos de cor
+    entry.writeUInt16LE(32, 6); // bits por pixel
+    entry.writeUInt32LE(image.length, 8);
+    entry.writeUInt32LE(offset, 12);
+    offset += image.length;
+    return entry;
+  });
+
+  await writeFile(path, Buffer.concat([header, ...entries, ...images]));
+}
+
 await mkdir('public/icons', { recursive: true });
 
 // Favicon da aba do navegador (convenção `app/icon.svg` do Next).
 await writeFile('src/app/icon.svg', iconSvg({ rounded: true }));
+
+// `/favicon.ico` clássico (convenção `app/favicon.ico` do Next). Sem ele o
+// Netlify responde com o favicon dele, e alguns aparelhos usam esse arquivo
+// como ícone do app instalado.
+await ico(iconSvg({ rounded: true }), [16, 32, 48], 'src/app/favicon.ico');
 
 // Ícones "any" do manifest: cantos arredondados e transparentes.
 await png(iconSvg({ rounded: true }), 192, 'public/icons/icon-192.png');
