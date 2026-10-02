@@ -7,15 +7,19 @@ import { ApiError } from '@/src/core/api';
 import { ApiIssue } from '@/src/core/api/type';
 import { registerUser, saveSession } from '@/src/core/auth';
 import { TextField } from '@/src/core/components/text-field';
+import { validateName } from '@/src/core/utils/validate-name';
 
 export default function RegistroPage() {
   const router = useRouter();
   const [name, setName] = useState('');
+  const [isNameTouched, setIsNameTouched] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [issues, setIssues] = useState<ApiIssue[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const nameError = isNameTouched ? validateName(name) : undefined;
 
   function issueFor(field: string) {
     return issues.find((issue) => issue.field === field)?.message;
@@ -23,6 +27,12 @@ export default function RegistroPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (validateName(name)) {
+      setIsNameTouched(true);
+      return;
+    }
+
     setErrorMessage('');
     setIssues([]);
     setIsSubmitting(true);
@@ -64,11 +74,13 @@ export default function RegistroPage() {
           label="Nome"
           type="text"
           value={name}
-          onChange={(event) => setName(event.target.value)}
-          error={issueFor('name')}
+          onChange={(event) => {
+            setName(event.target.value);
+            setIsNameTouched(true);
+          }}
+          error={nameError ?? issueFor('name')}
           placeholder="Edson Souza"
           autoComplete="name"
-          required
         />
 
         <TextField

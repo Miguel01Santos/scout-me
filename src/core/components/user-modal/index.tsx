@@ -2,7 +2,7 @@ import { MouseEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Settings, ShieldCheck } from "lucide-react";
-import { Avatar, Badge, Button, Chip, Skeleton } from "@heroui/react";
+import { Avatar, Badge, Chip, Skeleton } from "@heroui/react";
 import { DRAWER_EXIT_DURATION_MS, ModalComponent } from "../../library/modal";
 import { getInitials } from "../../utils/get-initials";
 import { getSession } from "../../auth";
@@ -11,7 +11,6 @@ import { User } from "../../api/user/type";
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
 import { useThemeClasses } from "../../hooks/use-theme-classes";
 import { ShieldIcon } from "../../icons";
-import { DialogLogout } from "../dialog-logout";
 import { UserModalProps } from "./type";
 
 const OPTION_CLASS_NAME =
@@ -21,7 +20,6 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
   const router = useRouter();
   const themeClasses = useThemeClasses();
   const [user, setUser] = useState<User | null>(null);
-  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const accountType = toAccountType(user?.account?.type);
 
   // Navegar na hora desmontaria o menu (o header some em algumas rotas) sem a animação
@@ -99,24 +97,17 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
           </nav>
         }
         footer={
-          <div className="flex w-full flex-col gap-4">
-            <div className="flex items-center space-x-2">
-              <ShieldIcon />
-              <div>
-                <p className="font-black text-sm tracking-wide bg-gradient-to-r from-amber-400 to-indigo-500 bg-clip-text text-transparent">
-                  ScoutMe PRO
-                </p>
-                <p className="text-[10px] text-slate-400">Scouting de base</p>
-              </div>
+          <div className="flex items-center space-x-2">
+            <ShieldIcon />
+            <div>
+              <p className="font-black text-sm tracking-wide bg-gradient-to-r from-amber-400 to-indigo-500 bg-clip-text text-transparent">
+                ScoutMe PRO
+              </p>
+              <p className="text-[10px] text-slate-400">Scouting de base</p>
             </div>
-            <Button variant="danger-soft" fullWidth onPress={() => setIsLogoutOpen(true)}>
-              Sair
-            </Button>
           </div>
         }
       />
-
-      <DialogLogout isOpen={isLogoutOpen} onOpenChange={setIsLogoutOpen} />
     </>
   );
 }

@@ -3,4 +3,6 @@ export interface ThemeClasses {
   card: string;
   cardHover: string;
   subText: string;
+  skeleton: string;
+  input: string;
 }

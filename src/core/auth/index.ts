@@ -1,4 +1,5 @@
 import { get, post } from '../api';
+import { clearCachedTheme } from '../utils/theme-cache';
 import { AuthSession, AuthUser, LoginInput, RegisterInput } from './type';
 
 const SESSION_KEY = 'scoutme.session';
@@ -33,4 +34,5 @@ export function getSession(): AuthSession | null {
 
 export function clearSession() {
   localStorage.removeItem(SESSION_KEY);
+  clearCachedTheme();
 }

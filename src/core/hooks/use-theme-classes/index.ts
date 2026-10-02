@@ -13,5 +13,9 @@ export function useThemeClasses(): ThemeClasses {
       : 'bg-white border-slate-200 shadow-sm',
     cardHover: darkMode ? 'hover:border-slate-700' : 'hover:border-slate-300',
     subText: darkMode ? 'text-slate-400' : 'text-slate-500',
+    skeleton: darkMode ? 'bg-slate-800' : 'bg-slate-200',
+    input: darkMode
+      ? 'bg-slate-900/90 border-slate-800 text-slate-100 placeholder:text-slate-600'
+      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400',
   };
 }

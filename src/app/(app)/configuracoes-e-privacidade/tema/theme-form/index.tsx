@@ -5,9 +5,10 @@ import { THEME_NAME } from '@/src/core/enums/theme';
 import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
 import { useAccount } from '@/src/core/providers/account';
 import { OptionGroup } from '../option-group';
+import { ThemeSkeleton } from '../theme-skeleton';
 
 export function ThemeForm() {
-  const { configuration, updateConfiguration } = useAccount();
+  const { configuration, isLoading, updateConfiguration } = useAccount();
   const themeClasses = useThemeClasses();
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -26,6 +27,8 @@ export function ThemeForm() {
       setIsSaving(false);
     }
   }
+
+  if (isLoading) return <ThemeSkeleton />;
 
   return (
     <section className={`p-4 border rounded-2xl space-y-4 ${themeClasses.card}`}>
