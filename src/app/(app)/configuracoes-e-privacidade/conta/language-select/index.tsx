@@ -5,10 +5,9 @@ import { Label, ListBox, Select } from '@heroui/react';
 import { Language, LANGUAGE_NAME } from '@/src/core/enums/language';
 import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
 import { useAccount } from '@/src/core/providers/account';
-import { LanguageSkeleton } from '../language-skeleton';
 
 export function LanguageSelect() {
-  const { configuration, isLoading, updateConfiguration } = useAccount();
+  const { configuration, updateConfiguration } = useAccount();
   const themeClasses = useThemeClasses();
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -28,8 +27,6 @@ export function LanguageSelect() {
     }
   }
 
-  if (isLoading) return <LanguageSkeleton />;
-
   return (
     <section className={`p-4 border rounded-2xl space-y-3 ${themeClasses.card}`}>
       {errorMessage && (
@@ -45,7 +42,7 @@ export function LanguageSelect() {
         value={configuration.language}
         onChange={(key) => saveLanguage(key as Language)}
       >
-        <Label>Linguagem da conta</Label>
+        <Label className="text-sm font-black">Linguagem da conta</Label>
         <Select.Trigger>
           <Select.Value />
           <Select.Indicator />

@@ -12,8 +12,8 @@ export function OptionGroup<TValue extends string>({
   const entries = Object.entries(options) as [TValue, string][];
 
   return (
-    <div>
-      <p className="block text-[10px] uppercase font-bold mb-1 opacity-60">{label}</p>
+    <div className="flex flex-col gap-4">
+      <p className="text-sm font-black">{label}</p>
       <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={label}>
         {entries.map(([optionValue, optionLabel]) => (
           <button

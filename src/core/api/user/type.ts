@@ -13,3 +13,8 @@ export interface UpdateUserInput {
   name?: string;
   avatarUrl?: string | null;
 }
+
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+}

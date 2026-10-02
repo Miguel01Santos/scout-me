@@ -1,15 +1,17 @@
 import { PageHeader } from '@/src/core/components/page-header';
-import { LanguageSelect } from './language-select';
+import { AccountSettings } from './account-settings';
+import { DeleteAccountButton } from './delete-account-button';
 import { LogoutButton } from './logout-button';
-import { ProfileForm } from './profile-form';
+import { ResetPasswordLink } from './reset-password-link';
 
 export default function AccountSettingsPage() {
   return (
     <main className="max-w-md mx-auto px-4 pt-4 pb-12 space-y-4">
       <PageHeader title="Conta" />
-      <ProfileForm />
-      <LanguageSelect />
+      <AccountSettings />
+      <ResetPasswordLink />
       <LogoutButton />
+      <DeleteAccountButton />
     </main>
   );
 }

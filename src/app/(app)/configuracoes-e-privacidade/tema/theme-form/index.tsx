@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { THEME_NAME } from '@/src/core/enums/theme';
+import { useSession } from '@/src/core/auth/use-session';
 import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
 import { useAccount } from '@/src/core/providers/account';
 import { OptionGroup } from '../option-group';
 import { ThemeSkeleton } from '../theme-skeleton';
 
 export function ThemeForm() {
+  const { user } = useSession();
   const { configuration, isLoading, updateConfiguration } = useAccount();
   const themeClasses = useThemeClasses();
   const [errorMessage, setErrorMessage] = useState('');
@@ -28,12 +30,11 @@ export function ThemeForm() {
     }
   }
 
-  if (isLoading) return <ThemeSkeleton />;
+  // Espera a sessão e a conta, para o card não aparecer antes dos dados.
+  if (!user || isLoading) return <ThemeSkeleton />;
 
   return (
     <section className={`p-4 border rounded-2xl space-y-4 ${themeClasses.card}`}>
-      <p className={`text-[11px] ${themeClasses.subText}`}>Salvo automaticamente na sua conta.</p>
-
       {errorMessage && (
         <p className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-[11px] font-semibold text-rose-400">
           {errorMessage}
@@ -41,7 +42,7 @@ export function ThemeForm() {
       )}
 
       <OptionGroup
-        label="Tema"
+        label="Tema do aplicativo"
         value={configuration.theme}
         options={THEME_NAME}
         disabled={isSaving}

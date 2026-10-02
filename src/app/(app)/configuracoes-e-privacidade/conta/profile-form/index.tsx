@@ -7,16 +7,14 @@ import { ApiError } from '@/src/core/api';
 import { ApiIssue } from '@/src/core/api/type';
 import { updateUser } from '@/src/core/api/user/service';
 import { getSession } from '@/src/core/auth';
-import { useSession } from '@/src/core/auth/use-session';
 import { TextField } from '@/src/core/components/text-field';
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from '@/src/core/enums/account-type';
 import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
 import { validateName } from '@/src/core/utils/validate-name';
 import { useAccount } from '@/src/core/providers/account';
-import { ProfileSkeleton } from '../profile-skeleton';
 import { ProfileFieldsProps } from '../type';
 
-function ProfileFields({ user }: ProfileFieldsProps) {
+export function ProfileForm({ user }: ProfileFieldsProps) {
   const { account } = useAccount();
   const themeClasses = useThemeClasses();
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -125,12 +123,4 @@ function ProfileFields({ user }: ProfileFieldsProps) {
       </button>
     </form>
   );
-}
-
-export function ProfileForm() {
-  const { user } = useSession();
-
-  if (!user) return <ProfileSkeleton />;
-
-  return <ProfileFields user={user} />;
 }
