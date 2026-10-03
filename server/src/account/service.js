@@ -26,6 +26,7 @@ function toPublicAccount(account, configuration) {
   return {
     id: account.id,
     type: account.type,
+    isPrivate: account.isPrivate,
     configuration: toPublicConfiguration(configuration),
   };
 }
@@ -50,4 +51,19 @@ export async function updateConfiguration(userId, data) {
   });
 
   return toPublicAccount(account, configuration);
+}
+
+export async function updateAccount(userId, data) {
+  const account = await findAccountByUserId(userId);
+  const updatedAccount = await prismaClient.account.update({
+    where: { id: account.id },
+    data: { ...data, updatedAt: new Date() },
+  });
+  const configuration = await prismaClient.configuration.upsert({
+    where: { accountId: account.id },
+    update: {},
+    create: { accountId: account.id },
+  });
+
+  return toPublicAccount(updatedAccount, configuration);
 }

@@ -9,8 +9,12 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
-import { getAccount, updateConfiguration as saveConfiguration } from '../../api/account/service';
-import { Account } from '../../api/account/type';
+import {
+  getAccount,
+  updateAccount as saveAccount,
+  updateConfiguration as saveConfiguration,
+} from '../../api/account/service';
+import { Account, UpdateAccountInput } from '../../api/account/type';
 import { Configuration, UpdateConfigurationInput } from '../../api/configuration/type';
 import { ensureSession, getSession } from '../../auth';
 import { Language } from '../../enums/language';
@@ -62,6 +66,16 @@ export function AccountProvider({ children }: AccountProviderProps) {
     if (response.account.configuration) saveCachedTheme(response.account.configuration.theme);
   }, []);
 
+  const updateAccount = useCallback(async (input: UpdateAccountInput) => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    const response = await saveAccount(session.accessToken, input);
+
+    setAccount(response.account);
+  }, []);
+
   const value = useMemo<AccountContextValue>(
     () => ({
       account,
@@ -69,8 +83,9 @@ export function AccountProvider({ children }: AccountProviderProps) {
         account?.configuration ?? { ...DEFAULT_CONFIGURATION, theme: cachedTheme ?? DEFAULT_CONFIGURATION.theme },
       isLoading,
       updateConfiguration,
+      updateAccount,
     }),
-    [account, cachedTheme, isLoading, updateConfiguration]
+    [account, cachedTheme, isLoading, updateConfiguration, updateAccount]
   );
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;

@@ -6,3 +6,7 @@ export const updateConfigurationSchema = z.object({
   language: z.enum(Object.values(Language), 'Idioma inválido').optional(),
   notifications: z.boolean('Valor inválido').optional(),
 });
+
+export const updateAccountSchema = z.object({
+  isPrivate: z.boolean('Valor inválido'),
+});

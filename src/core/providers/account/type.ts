@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Account } from '../../api/account/type';
+import { Account, UpdateAccountInput } from '../../api/account/type';
 import { Configuration, UpdateConfigurationInput } from '../../api/configuration/type';
 
 export interface AccountProviderProps {
@@ -11,4 +11,5 @@ export interface AccountContextValue {
   configuration: Configuration;
   isLoading: boolean;
   updateConfiguration: (input: UpdateConfigurationInput) => Promise<void>;
+  updateAccount: (input: UpdateAccountInput) => Promise<void>;
 }
