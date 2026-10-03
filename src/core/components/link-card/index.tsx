@@ -1,20 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight, KeyRound } from 'lucide-react';
-import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
+import { ChevronRight } from 'lucide-react';
+import { useThemeClasses } from '../../hooks/use-theme-classes';
+import { LinkCardProps } from './type';
 
-export function ResetPasswordLink() {
+export function LinkCard({ label, href, icon: Icon }: LinkCardProps) {
   const themeClasses = useThemeClasses();
 
   return (
     <Link
-      href="/redefinir-senha"
+      href={href}
       className={`flex items-center justify-between p-3.5 border rounded-2xl transition ${themeClasses.card} ${themeClasses.cardHover}`}
     >
       <span className="flex items-center gap-3 text-sm font-bold">
-        <KeyRound size={18} />
-        Redefinir minha senha
+        <Icon size={18} />
+        {label}
       </span>
       <ChevronRight size={16} className={themeClasses.subText} />
     </Link>

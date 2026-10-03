@@ -1,12 +1,12 @@
 'use client';
 
 import { LinkCard } from '@/src/core/components/link-card';
-import { SETTINGS_ROUTES } from '../constants';
+import { PRIVACY_ROUTES } from '../constants';
 
-export function SettingsList() {
+export function PrivacyList() {
   return (
     <nav className="space-y-2">
-      {SETTINGS_ROUTES.map((route) => (
+      {PRIVACY_ROUTES.map((route) => (
         <LinkCard key={route.href} {...route} />
       ))}
     </nav>
