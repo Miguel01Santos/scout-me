@@ -13,3 +13,7 @@ export function validateName(name: string): string | undefined {
 
   return undefined;
 }
+
+export function validateDisplayName(name: string): string | undefined {
+  return name.length === 0 ? undefined : validateName(name);
+}

@@ -1,5 +1,6 @@
 import { get, patch } from '../index';
 import { UpdateConfigurationInput } from '../configuration/type';
+import { UpdateProfileInput } from '../profile/type';
 import { Account, UpdateAccountInput } from './type';
 
 export function getAccount(accessToken: string) {
@@ -12,4 +13,8 @@ export function updateConfiguration(accessToken: string, input: UpdateConfigurat
 
 export function updateAccount(accessToken: string, input: UpdateAccountInput) {
   return patch<{ account: Account }>('/account/me', accessToken, input);
+}
+
+export function updateProfile(accessToken: string, input: UpdateProfileInput) {
+  return patch<{ account: Account }>('/account/me/profile', accessToken, input);
 }

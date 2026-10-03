@@ -2,9 +2,9 @@ import { MouseEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Settings, ShieldCheck } from "lucide-react";
-import { Avatar, Badge, Chip, Skeleton } from "@heroui/react";
+import { Badge, Chip, Skeleton } from "@heroui/react";
 import { DRAWER_EXIT_DURATION_MS, ModalComponent } from "../../library/modal";
-import { getInitials } from "../../utils/get-initials";
+import { UserAvatar } from "../user-avatar";
 import { getSession } from "../../auth";
 import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
@@ -59,10 +59,7 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
               className="flex items-center gap-3"
             >
               <Badge.Anchor>
-                <Avatar>
-                  <Avatar.Image alt={user.name} src={user.avatarUrl ?? undefined} />
-                  <Avatar.Fallback>{getInitials(user.name)}</Avatar.Fallback>
-                </Avatar>
+                <UserAvatar name={user.name} avatarUrl={user.avatarUrl} size="md" />
               </Badge.Anchor>
               <div>
                 <h2 className="text-lg font-semibold">{user.name}</h2>

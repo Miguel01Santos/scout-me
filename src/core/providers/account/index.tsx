@@ -12,10 +12,12 @@ import {
 import {
   getAccount,
   updateAccount as saveAccount,
+  updateProfile as saveProfile,
   updateConfiguration as saveConfiguration,
 } from '../../api/account/service';
 import { Account, UpdateAccountInput } from '../../api/account/type';
 import { Configuration, UpdateConfigurationInput } from '../../api/configuration/type';
+import { UpdateProfileInput } from '../../api/profile/type';
 import { ensureSession, getSession } from '../../auth';
 import { Language } from '../../enums/language';
 import { Theme } from '../../enums/theme';
@@ -76,6 +78,16 @@ export function AccountProvider({ children }: AccountProviderProps) {
     setAccount(response.account);
   }, []);
 
+  const updateProfile = useCallback(async (input: UpdateProfileInput) => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    const response = await saveProfile(session.accessToken, input);
+
+    setAccount(response.account);
+  }, []);
+
   const value = useMemo<AccountContextValue>(
     () => ({
       account,
@@ -84,8 +96,9 @@ export function AccountProvider({ children }: AccountProviderProps) {
       isLoading,
       updateConfiguration,
       updateAccount,
+      updateProfile,
     }),
-    [account, cachedTheme, isLoading, updateConfiguration, updateAccount]
+    [account, cachedTheme, isLoading, updateConfiguration, updateAccount, updateProfile]
   );
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;

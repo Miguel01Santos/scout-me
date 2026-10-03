@@ -32,6 +32,7 @@ model Account {
 
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   configuration Configuration?
+  profile       Profile?
 
   @@map("account")
 }
@@ -45,4 +46,16 @@ model Configuration {
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("configuration")
+}
+
+model Profile {
+  accountId       Int     @id @map("account_id")
+  displayName     String? @map("display_name")
+  showDisplayName Boolean @default(true) @map("show_display_name")
+  bio             String?
+  avatarColor     String? @map("avatar_color")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("profile")
 }

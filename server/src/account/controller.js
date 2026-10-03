@@ -1,5 +1,5 @@
-import { updateAccountSchema, updateConfigurationSchema } from './schema.js';
-import { getAccount, updateAccount, updateConfiguration } from './service.js';
+import { updateAccountSchema, updateConfigurationSchema, updateProfileSchema } from './schema.js';
+import { getAccount, updateAccount, updateConfiguration, updateProfile } from './service.js';
 
 export async function me(request, response) {
   const account = await getAccount(request.userId);
@@ -17,6 +17,13 @@ export async function update(request, response) {
 export async function updateMe(request, response) {
   const data = updateAccountSchema.parse(request.body);
   const account = await updateAccount(request.userId, data);
+
+  return response.status(200).json({ account });
+}
+
+export async function updateMyProfile(request, response) {
+  const data = updateProfileSchema.parse(request.body);
+  const account = await updateProfile(request.userId, data);
 
   return response.status(200).json({ account });
 }

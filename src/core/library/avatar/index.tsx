@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Avatar, Badge } from "@heroui/react";
+import { Badge } from "@heroui/react";
 import { UserAvatarProps } from "./type";
-import { getInitials } from "../../utils/get-initials";
+import { UserAvatar } from "../../components/user-avatar";
 import { UserModal } from "../../components/user-modal";
 import { ACCOUNT_TYPE_COLOR, toAccountType } from "../../enums/account-type";
 
@@ -14,10 +14,7 @@ export function AvatarComponent({ name, avatarUrl, accountType }: UserAvatarProp
         onClick={() => setIsOpen(true)}
         className={`ring-2 ${ACCOUNT_TYPE_COLOR[toAccountType(accountType)].ring} rounded-full cursor-pointer`}
       >
-        <Avatar className="size-[35px] text-xs">
-          <Avatar.Image alt={name} src={avatarUrl} />
-          <Avatar.Fallback>{getInitials(name)}</Avatar.Fallback>
-        </Avatar>
+        <UserAvatar name={name} avatarUrl={avatarUrl} size="sm" />
       </Badge.Anchor>
 
       <UserModal isOpen={isOpen} onOpenChange={setIsOpen} />

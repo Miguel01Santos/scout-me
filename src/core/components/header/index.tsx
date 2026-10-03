@@ -12,7 +12,11 @@ export function Header() {
   return (
     <div className="flex items-center gap-3">
       {user ? (
-        <AvatarComponent name={user.name} accountType={user.account?.type} />
+        <AvatarComponent
+          name={user.name}
+          avatarUrl={user.avatarUrl}
+          accountType={user.account?.type}
+        />
       ) : (
         <Skeleton className={`size-[35px] rounded-full ${themeClasses.skeleton}`} />
       )}

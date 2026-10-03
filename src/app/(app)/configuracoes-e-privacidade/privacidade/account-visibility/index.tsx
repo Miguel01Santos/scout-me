@@ -31,6 +31,8 @@ export function AccountVisibility() {
 
   if (!user || isLoading) return <AccountVisibilitySkeleton />;
 
+  const isPrivate = account?.isPrivate ?? true;
+
   return (
     <section className={`p-4 border rounded-2xl space-y-3 ${themeClasses.card}`}>
       {errorMessage && (
@@ -41,7 +43,7 @@ export function AccountVisibility() {
 
       <Switch
         className="w-full justify-between"
-        isSelected={account?.isPrivate ?? true}
+        isSelected={isPrivate}
         isDisabled={isSaving}
         onChange={saveVisibility}
       >
@@ -49,7 +51,9 @@ export function AccountVisibility() {
           <span className="flex flex-col gap-1">
             <Label className="text-sm font-black text-inherit!">Conta privada</Label>
             <span className={`text-[11px] ${themeClasses.subText}`}>
-              Desative para deixar sua conta pública.
+              {isPrivate
+                ? 'Desative para deixar sua conta pública.'
+                : 'Ative para deixar sua conta privada.'}
             </span>
           </span>
           <Switch.Control>

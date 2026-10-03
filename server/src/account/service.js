@@ -9,10 +9,20 @@ function toPublicConfiguration(configuration) {
   };
 }
 
+function toPublicProfile(profile) {
+  return {
+    displayName: profile?.displayName ?? null,
+    showDisplayName: profile?.showDisplayName ?? true,
+    bio: profile?.bio ?? null,
+    avatarColor: profile?.avatarColor ?? null,
+  };
+}
+
 async function findAccountByUserId(userId) {
   const account = await prismaClient.account.findFirst({
     where: { userId },
     orderBy: { id: 'asc' },
+    include: { profile: true },
   });
 
   if (!account) {
@@ -20,15 +30,6 @@ async function findAccountByUserId(userId) {
   }
 
   return account;
-}
-
-function toPublicAccount(account, configuration) {
-  return {
-    id: account.id,
-    type: account.type,
-    isPrivate: account.isPrivate,
-    configuration: toPublicConfiguration(configuration),
-  };
 }
 
 export async function getAccount(userId) {
@@ -39,31 +40,46 @@ export async function getAccount(userId) {
     create: { accountId: account.id },
   });
 
-  return toPublicAccount(account, configuration);
+  return {
+    id: account.id,
+    type: account.type,
+    isPrivate: account.isPrivate,
+    configuration: toPublicConfiguration(configuration),
+    profile: toPublicProfile(account.profile),
+  };
 }
 
 export async function updateConfiguration(userId, data) {
   const account = await findAccountByUserId(userId);
-  const configuration = await prismaClient.configuration.upsert({
+
+  await prismaClient.configuration.upsert({
     where: { accountId: account.id },
     update: data,
     create: { accountId: account.id, ...data },
   });
 
-  return toPublicAccount(account, configuration);
+  return getAccount(userId);
 }
 
 export async function updateAccount(userId, data) {
   const account = await findAccountByUserId(userId);
-  const updatedAccount = await prismaClient.account.update({
+
+  await prismaClient.account.update({
     where: { id: account.id },
     data: { ...data, updatedAt: new Date() },
   });
-  const configuration = await prismaClient.configuration.upsert({
+
+  return getAccount(userId);
+}
+
+export async function updateProfile(userId, data) {
+  const account = await findAccountByUserId(userId);
+
+  await prismaClient.profile.upsert({
     where: { accountId: account.id },
-    update: {},
-    create: { accountId: account.id },
+    update: data,
+    create: { accountId: account.id, ...data },
   });
 
-  return toPublicAccount(updatedAccount, configuration);
+  return getAccount(userId);
 }

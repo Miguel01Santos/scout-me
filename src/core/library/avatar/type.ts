@@ -1,5 +1,5 @@
 export interface UserAvatarProps {
   name: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
   accountType?: string;
 }
