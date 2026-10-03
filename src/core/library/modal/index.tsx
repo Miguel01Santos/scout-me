@@ -2,7 +2,6 @@ import { CSSProperties } from "react";
 import { Drawer, Separator } from "@heroui/react";
 import { ModalComponentProps } from "./type";
 
-// Fechamento mais lento que o padrão do HeroUI (200ms).
 export const DRAWER_EXIT_DURATION_MS = 500;
 
 const EXIT_ANIMATION_STYLE = {

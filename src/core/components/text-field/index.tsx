@@ -1,7 +1,6 @@
 import { useId } from 'react';
 import { TextFieldProps } from './type';
 
-// Visual padrão (escuro), usado onde não há tema, como login e cadastro.
 const DEFAULT_INPUT_CLASS_NAME =
   'bg-slate-900/90 border-slate-800 text-slate-100 placeholder:text-slate-600';
 

@@ -22,8 +22,6 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
   const [user, setUser] = useState<User | null>(null);
   const accountType = toAccountType(user?.account?.type);
 
-  // Navegar na hora desmontaria o menu (o header some em algumas rotas) sem a animação
-  // de saída; por isso fecha primeiro e só navega quando o menu terminou de sair.
   function navigateAfterClose(event: MouseEvent<HTMLAnchorElement>, href: string) {
     event.preventDefault();
     onOpenChange(false);

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import bcryptjs from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 import { prismaClient } from '../prisma.js';
@@ -49,6 +50,25 @@ export async function authenticateUser({ email, password }) {
   if (!passwordMatches) {
     throw new HttpError(401, 'E-mail ou senha inválidos');
   }
+
+  return { user: toPublicUser(user), accessToken: generateAccessToken(user) };
+}
+
+const DEV_USER_EMAIL = 'dev@localhost';
+
+export async function loginDevUser() {
+  const user =
+    (await prismaClient.user.findUnique({ where: { email: DEV_USER_EMAIL } })) ??
+    (await prismaClient.user.create({
+      data: {
+        name: 'Dev Local',
+        email: DEV_USER_EMAIL,
+        password: await bcryptjs.hash(randomUUID(), PASSWORD_SALT_ROUNDS),
+        accounts: {
+          create: { type: AccountType.PLAYER, configuration: { create: {} } },
+        },
+      },
+    }));
 
   return { user: toPublicUser(user), accessToken: generateAccessToken(user) };
 }

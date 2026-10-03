@@ -30,7 +30,6 @@ export function ThemeForm() {
     }
   }
 
-  // Espera a sessão e a conta, para o card não aparecer antes dos dados.
   if (!user || isLoading) return <ThemeSkeleton />;
 
   return (

@@ -1,8 +1,5 @@
 import { HttpError } from '../http-error.js';
 
-// Limitador em memória por usuário autenticado (usar depois do `authenticate`).
-// Cada instância do servidor conta sozinha: em ambiente com várias instâncias/serverless
-// o limite efetivo é por instância. Para um limite global, trocar por um store compartilhado.
 export function rateLimitByUser({ maxRequests, windowMs, message }) {
   const attempts = new Map();
 

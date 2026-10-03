@@ -5,10 +5,18 @@ if (missingVariables.length > 0) {
   throw new Error(`Variáveis de ambiente ausentes: ${missingVariables.join(', ')}`);
 }
 
+const isHostedEnvironment = process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
+const devLoginEnabled = process.env.DEV_LOGIN_ENABLED === 'true';
+
+if (devLoginEnabled && isHostedEnvironment) {
+  throw new Error('DEV_LOGIN_ENABLED não pode ser usada em produção');
+}
+
 export const env = {
   port: Number(process.env.PORT ?? 3333),
   databaseUrl: process.env.DATABASE_URL,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   corsOrigin: process.env.CORS_ORIGIN ?? '*',
+  devLoginEnabled,
 };

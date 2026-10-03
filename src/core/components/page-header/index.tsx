@@ -8,7 +8,6 @@ export function PageHeader({ title }: PageHeaderProps) {
   const router = useRouter();
 
   function goBack() {
-    // Sem histórico (página aberta direto pela URL) não há rota anterior para voltar.
     if (window.history.length > 1) {
       router.back();
       return;

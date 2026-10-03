@@ -9,8 +9,6 @@ export function AppShell({ children }: AppShellProps) {
   const themeClasses = useThemeClasses();
   const darkMode = useDarkMode();
 
-  // Drawers e modais do HeroUI renderizam num portal fora deste componente; o tema
-  // precisa estar no <html> para eles também seguirem a preferência do usuário.
   useEffect(() => {
     document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
 

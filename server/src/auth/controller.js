@@ -1,5 +1,5 @@
 import { registerSchema, loginSchema } from './schema.js';
-import { registerUser, authenticateUser } from './service.js';
+import { registerUser, authenticateUser, loginDevUser } from './service.js';
 
 export async function register(request, response) {
   const data = registerSchema.parse(request.body);
@@ -11,6 +11,12 @@ export async function register(request, response) {
 export async function login(request, response) {
   const data = loginSchema.parse(request.body);
   const result = await authenticateUser(data);
+
+  return response.status(200).json(result);
+}
+
+export async function devLogin(request, response) {
+  const result = await loginDevUser();
 
   return response.status(200).json(result);
 }

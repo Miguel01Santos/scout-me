@@ -127,7 +127,6 @@ function ResetPasswordFields() {
         </button>
       </form>
 
-      {/* TODO: fluxo de recuperação de senha ainda não definido. */}
       <p className={`text-center text-xs ${themeClasses.subText}`}>Não lembro minha senha</p>
     </>
   );
@@ -136,7 +135,6 @@ function ResetPasswordFields() {
 export function ResetPasswordForm() {
   const { user } = useSession();
 
-  // A página só libera o formulário depois que a sessão é validada.
   if (!user) return <ResetPasswordSkeleton />;
 
   return <ResetPasswordFields />;

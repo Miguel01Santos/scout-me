@@ -3,7 +3,6 @@ import { z } from 'zod';
 const NAME_MIN_LENGTH = 3;
 const NAME_MAX_LENGTH = 25;
 
-// Os espaços contam no tamanho. Mantenha em sincronia com src/core/utils/validate-name no front.
 export const nameSchema = z.string().superRefine((name, context) => {
   let message;
 
@@ -24,7 +23,6 @@ export const updateUserSchema = z.object({
 });
 
 const PASSWORD_MIN_LENGTH = 8;
-// O bcrypt só considera os 72 primeiros bytes; acima disso a senha seria truncada em silêncio.
 const PASSWORD_MAX_LENGTH = 72;
 
 export const changePasswordSchema = z

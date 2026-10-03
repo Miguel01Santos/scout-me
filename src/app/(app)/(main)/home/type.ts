@@ -3,7 +3,6 @@ import { Talent } from '@/src/core/mocks/type';
 
 export type Blueprint = Record<string, number>;
 
-
 export interface TabProps {
   talents: Talent[];
   themeClasses: ThemeClasses;

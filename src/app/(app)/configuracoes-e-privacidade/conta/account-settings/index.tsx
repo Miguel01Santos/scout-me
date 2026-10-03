@@ -11,8 +11,6 @@ export function AccountSettings() {
   const { user } = useSession();
   const { isLoading } = useAccount();
 
-  // Os dois cards dependem de dados diferentes (usuário e conta); esperar ambos evita
-  // um card aparecer pronto enquanto o outro ainda é skeleton.
   if (!user || isLoading) {
     return (
       <>

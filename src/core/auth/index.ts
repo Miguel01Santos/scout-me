@@ -36,3 +36,29 @@ export function clearSession() {
   localStorage.removeItem(SESSION_KEY);
   clearCachedTheme();
 }
+
+export function loginDevUser() {
+  return post<AuthSession>('/auth/dev-login', {});
+}
+
+let devSessionRequest: Promise<AuthSession | null> | null = null;
+
+export function ensureSession(): Promise<AuthSession | null> {
+  const session = getSession();
+
+  if (session) return Promise.resolve(session);
+  if (window.location.hostname !== 'localhost') return Promise.resolve(null);
+
+  devSessionRequest ??= loginDevUser()
+    .then((devSession) => {
+      saveSession(devSession);
+
+      return devSession;
+    })
+    .catch(() => null)
+    .finally(() => {
+      devSessionRequest = null;
+    });
+
+  return devSessionRequest;
+}

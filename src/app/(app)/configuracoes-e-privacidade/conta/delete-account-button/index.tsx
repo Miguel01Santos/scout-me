@@ -20,7 +20,6 @@ export function DeleteAccountButton() {
         Excluir conta
       </Button>
 
-      {/* TODO: a exclusão ainda não foi definida; por enquanto confirmar só fecha o diálogo. */}
       <DialogComponent
         isOpen={isOpen}
         onOpenChange={setIsOpen}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { clearSession, fetchLoggedUser, getSession } from '.';
+import { clearSession, ensureSession, fetchLoggedUser } from '.';
 import { AuthUser } from './type';
 
 const LOCAL_DEV_USER: AuthUser = {
@@ -18,24 +18,35 @@ export function useSession() {
 
   useEffect(() => {
     const isLocalhost = window.location.hostname === 'localhost';
-    const session = getSession();
 
-    if (!session && !isLocalhost) {
-      router.replace('/login');
-      return;
-    }
+    async function loadUser(): Promise<AuthUser | null> {
+      const session = await ensureSession();
 
-    // Sem sessão em localhost entra com o usuário de dev; o usuário sempre
-    // chega por promise para não chamar setState direto no corpo do effect.
-    const loadUser = session
-      ? fetchLoggedUser(session.accessToken).then((response) => response.user)
-      : Promise.resolve(LOCAL_DEV_USER);
+      if (!session) return isLocalhost ? LOCAL_DEV_USER : null;
 
-    loadUser
-      .then((loadedUser) => setUser(loadedUser))
-      .catch(() => {
+      try {
+        return (await fetchLoggedUser(session.accessToken)).user;
+      } catch {
         clearSession();
 
+        const devSession = isLocalhost ? await ensureSession() : null;
+
+        if (!devSession) return isLocalhost ? LOCAL_DEV_USER : null;
+
+        return (await fetchLoggedUser(devSession.accessToken)).user;
+      }
+    }
+
+    loadUser()
+      .then((loadedUser) => {
+        if (loadedUser) {
+          setUser(loadedUser);
+          return;
+        }
+
+        router.replace('/login');
+      })
+      .catch(() => {
         if (isLocalhost) {
           setUser(LOCAL_DEV_USER);
           return;

@@ -12,7 +12,7 @@ import {
 import { getAccount, updateConfiguration as saveConfiguration } from '../../api/account/service';
 import { Account } from '../../api/account/type';
 import { Configuration, UpdateConfigurationInput } from '../../api/configuration/type';
-import { getSession } from '../../auth';
+import { ensureSession, getSession } from '../../auth';
 import { Language } from '../../enums/language';
 import { Theme } from '../../enums/theme';
 import {
@@ -22,7 +22,6 @@ import {
 } from '../../utils/theme-cache';
 import { AccountContextValue, AccountProviderProps } from './type';
 
-// Aplicado enquanto a conta não chega (ou quando não há sessão, como em dev local).
 export const DEFAULT_CONFIGURATION: Configuration = {
   theme: Theme.DARK,
   language: Language.PT,
@@ -37,10 +36,9 @@ export function AccountProvider({ children }: AccountProviderProps) {
   const cachedTheme = useSyncExternalStore(subscribeToCachedTheme, getCachedTheme, () => null);
 
   useEffect(() => {
-    const session = getSession();
-    const loadAccount = session
-      ? getAccount(session.accessToken).then((response) => response.account)
-      : Promise.resolve(null);
+    const loadAccount = ensureSession().then((session) =>
+      session ? getAccount(session.accessToken).then((response) => response.account) : null
+    );
 
     loadAccount
       .then((loadedAccount) => {
