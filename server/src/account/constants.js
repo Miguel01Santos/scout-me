@@ -1,6 +1,6 @@
 export const AccountType = {
-  PERSON: 'person',
+  PLAYER: 'player',
   TEAM: 'team',
-  FEDERATION: 'federation',
+  ORGANIZATION: 'organization',
   SCOUT: 'scout',
 };

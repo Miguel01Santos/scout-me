@@ -29,7 +29,7 @@ export async function registerUser({ name, email, password }) {
       email,
       password: hashedPassword,
       accounts: {
-        create: { type: AccountType.PERSON, configuration: { create: {} } },
+        create: { type: AccountType.PLAYER, configuration: { create: {} } },
       },
     },
   });

@@ -52,7 +52,7 @@ Rotas autenticadas esperam o cabeçalho `Authorization: Bearer <token>`.
 
 `201` devolve `{ user, accessToken }`. O e-mail é normalizado (sem espaços e em
 minúsculas) antes de ser gravado. Junto com o usuário é criada uma conta do tipo
-`person` com a configuração padrão (`light`, `pt`, notificações ligadas).
+`player` com a configuração padrão (`light`, `pt`, notificações ligadas).
 
 ### POST /auth/login
 
@@ -99,7 +99,7 @@ src/
 │   ├── service.js          regras de cadastro e autenticação
 │   └── schema.js           validação do corpo das requisições
 ├── account/
-│   └── constants.js        tipos de conta (person, team, federation, scout)
+│   └── constants.js        tipos de conta (player, team, organization, scout)
 ├── configuration/
 │   └── constants.js        valores de tema e idioma
 └── user/

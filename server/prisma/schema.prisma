@@ -22,9 +22,10 @@ model User {
 }
 
 model Account {
-  id     Int    @id @default(autoincrement())
-  userId String @map("user_id")
-  type   String
+  id        Int     @id @default(autoincrement())
+  userId    String  @map("user_id")
+  type      String
+  isPrivate Boolean @default(true) @map("is_private")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
