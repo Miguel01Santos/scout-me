@@ -1,6 +1,7 @@
 import { Menu } from 'lucide-react';
 import { IconLinkButton } from '@/src/core/components/icon-link-button';
 import { PageHeader } from '@/src/core/components/page-header';
+import { ThemedSeparator } from '@/src/core/components/themed-separator';
 import { ProfileSummary } from './profile-summary';
 
 export default function ProfilePage() {
@@ -15,6 +16,7 @@ export default function ProfilePage() {
         }
       />
       <ProfileSummary />
+      <ThemedSeparator />
     </main>
   );
 }

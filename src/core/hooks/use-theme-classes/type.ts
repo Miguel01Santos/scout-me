@@ -5,4 +5,6 @@ export interface ThemeClasses {
   subText: string;
   skeleton: string;
   input: string;
+  popover: string;
+  divider: string;
 }

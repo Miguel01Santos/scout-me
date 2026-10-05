@@ -9,8 +9,9 @@ function toPublicConfiguration(configuration) {
   };
 }
 
-function toPublicProfile(profile) {
+function toPublicProfile(profile, avatarUrl) {
   return {
+    avatarUrl: avatarUrl ?? null,
     displayName: profile?.displayName ?? null,
     showDisplayName: profile?.showDisplayName ?? true,
     bio: profile?.bio ?? null,
@@ -22,7 +23,7 @@ async function findAccountByUserId(userId) {
   const account = await prismaClient.account.findFirst({
     where: { userId },
     orderBy: { id: 'asc' },
-    include: { profile: true },
+    include: { profile: true, user: { select: { avatarUrl: true } } },
   });
 
   if (!account) {
@@ -45,7 +46,7 @@ export async function getAccount(userId) {
     type: account.type,
     isPrivate: account.isPrivate,
     configuration: toPublicConfiguration(configuration),
-    profile: toPublicProfile(account.profile),
+    profile: toPublicProfile(account.profile, account.user.avatarUrl),
   };
 }
 

@@ -14,4 +14,6 @@ export interface AccountContextValue {
   updateConfiguration: (input: UpdateConfigurationInput) => Promise<void>;
   updateAccount: (input: UpdateAccountInput) => Promise<void>;
   updateProfile: (input: UpdateProfileInput) => Promise<void>;
+  changeAvatar: (image: Blob) => Promise<void>;
+  removeAvatar: () => Promise<void>;
 }

@@ -11,3 +11,15 @@ export interface AvatarColorPickerProps {
   value: AvatarColor | null;
   onChange: (color: AvatarColor | null) => void;
 }
+
+export interface EditorFeedback {
+  message: string;
+  isError: boolean;
+}
+
+export interface AvatarEditorProps {
+  name: string;
+  avatarUrl: string | null;
+  color: AvatarColor | null;
+  onResult: (feedback: EditorFeedback) => void;
+}

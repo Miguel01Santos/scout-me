@@ -1,6 +1,7 @@
 import bcryptjs from 'bcryptjs';
 import { prismaClient } from '../prisma.js';
 import { HttpError } from '../http-error.js';
+import { destroyAvatar, toOwnedAvatarPublicId } from '../cloudinary/service.js';
 
 export function toPublicUser(user) {
   return {
@@ -52,4 +53,40 @@ export async function changePassword(userId, { currentPassword, newPassword }) {
   const hashedPassword = await bcryptjs.hash(newPassword, PASSWORD_SALT_ROUNDS);
 
   await prismaClient.user.update({ where: { id: userId }, data: { password: hashedPassword } });
+}
+
+async function discardPreviousAvatar(previousUrl, nextUrl) {
+  const previousPublicId = toOwnedAvatarPublicId(previousUrl);
+
+  if (previousPublicId && previousUrl !== nextUrl) {
+    await destroyAvatar(previousPublicId);
+  }
+}
+
+export async function setAvatar(userId, avatarUrl) {
+  if (!toOwnedAvatarPublicId(avatarUrl)) {
+    throw new HttpError(400, 'Endereço de foto inválido');
+  }
+
+  const user = await prismaClient.user.findUnique({ where: { id: userId } });
+
+  if (!user) {
+    throw new HttpError(404, 'Usuário não encontrado');
+  }
+
+  await prismaClient.user.update({ where: { id: userId }, data: { avatarUrl } });
+  await discardPreviousAvatar(user.avatarUrl, avatarUrl);
+
+  return avatarUrl;
+}
+
+export async function removeAvatar(userId) {
+  const user = await prismaClient.user.findUnique({ where: { id: userId } });
+
+  if (!user) {
+    throw new HttpError(404, 'Usuário não encontrado');
+  }
+
+  await prismaClient.user.update({ where: { id: userId }, data: { avatarUrl: null } });
+  await discardPreviousAvatar(user.avatarUrl, null);
 }

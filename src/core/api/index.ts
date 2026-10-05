@@ -57,3 +57,28 @@ export function patch<TResponse>(path: string, accessToken: string, body: unknow
     body: JSON.stringify(body),
   });
 }
+
+export function postAuthenticated<TResponse>(path: string, accessToken: string) {
+  return request<TResponse>(path, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export function put<TResponse>(path: string, accessToken: string, body: unknown) {
+  return request<TResponse>(path, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+export function del<TResponse>(path: string, accessToken: string) {
+  return request<TResponse>(path, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}

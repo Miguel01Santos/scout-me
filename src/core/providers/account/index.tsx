@@ -16,6 +16,7 @@ import {
   updateConfiguration as saveConfiguration,
 } from '../../api/account/service';
 import { Account, UpdateAccountInput } from '../../api/account/type';
+import { deleteAvatar, uploadAvatar } from '../../api/avatar/service';
 import { Configuration, UpdateConfigurationInput } from '../../api/configuration/type';
 import { UpdateProfileInput } from '../../api/profile/type';
 import { ensureSession, getSession } from '../../auth';
@@ -88,6 +89,37 @@ export function AccountProvider({ children }: AccountProviderProps) {
     setAccount(response.account);
   }, []);
 
+  const refreshAccount = useCallback(async () => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    const response = await getAccount(session.accessToken);
+
+    setAccount(response.account);
+  }, []);
+
+  const changeAvatar = useCallback(
+    async (image: Blob) => {
+      const session = getSession();
+
+      if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+      await uploadAvatar(session.accessToken, image);
+      await refreshAccount();
+    },
+    [refreshAccount]
+  );
+
+  const removeAvatar = useCallback(async () => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    await deleteAvatar(session.accessToken);
+    await refreshAccount();
+  }, [refreshAccount]);
+
   const value = useMemo<AccountContextValue>(
     () => ({
       account,
@@ -97,8 +129,19 @@ export function AccountProvider({ children }: AccountProviderProps) {
       updateConfiguration,
       updateAccount,
       updateProfile,
+      changeAvatar,
+      removeAvatar,
     }),
-    [account, cachedTheme, isLoading, updateConfiguration, updateAccount, updateProfile]
+    [
+      account,
+      cachedTheme,
+      isLoading,
+      updateConfiguration,
+      updateAccount,
+      updateProfile,
+      changeAvatar,
+      removeAvatar,
+    ]
   );
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;

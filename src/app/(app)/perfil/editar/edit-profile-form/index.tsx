@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from 'react';
 import { useSession } from '@/src/core/auth/use-session';
-import { ProfileAvatar } from '@/src/core/components/profile-avatar';
 import { TextAreaField } from '@/src/core/components/textarea-field';
 import { TextField } from '@/src/core/components/text-field';
 import { AvatarColor, toAvatarColor } from '@/src/core/enums/avatar-color';
@@ -10,7 +9,9 @@ import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
 import { useAccount } from '@/src/core/providers/account';
 import { BIO_MAX_LENGTH, validateBio } from '@/src/core/utils/validate-bio';
 import { validateDisplayName } from '@/src/core/utils/validate-name';
+import { resolveAvatarUrl } from '@/src/core/utils/resolve-avatar-url';
 import { AvatarColorPicker } from '../avatar-color-picker';
+import { AvatarEditor } from '../avatar-editor';
 import { DisplayNameSwitch } from '../display-name-switch';
 import { EditProfileSkeleton } from '../edit-profile-skeleton';
 
@@ -25,6 +26,7 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
   const [feedback, setFeedback] = useState<{ message: string; isError: boolean } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const currentAvatarUrl = resolveAvatarUrl(savedProfile, avatarUrl);
   const nameError = validateDisplayName(displayName);
   const bioError = validateBio(bio);
   const hasChanges =
@@ -61,10 +63,11 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
 
   return (
     <form onSubmit={handleSubmit} className={`p-4 border rounded-2xl space-y-4 ${themeClasses.card}`}>
-      <ProfileAvatar
+      <AvatarEditor
         name={displayName && showDisplayName ? displayName : userName}
-        avatarUrl={avatarUrl}
+        avatarUrl={currentAvatarUrl}
         color={color}
+        onResult={setFeedback}
       />
 
       {feedback && (
@@ -106,16 +109,8 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
           counter={`${bio.length}/${BIO_MAX_LENGTH}`}
           rows={4}
         />
-        <AvatarColorPicker value={color} onChange={setColor} />
+        {!currentAvatarUrl && <AvatarColorPicker value={color} onChange={setColor} />}
       </div>
-
-      <button
-        type="button"
-        disabled
-        className="w-full py-2.5 border rounded-xl font-bold text-xs transition disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Alterar foto (em breve)
-      </button>
 
       <button
         type="submit"

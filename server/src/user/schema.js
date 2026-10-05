@@ -19,7 +19,6 @@ export const nameSchema = z.string().superRefine((name, context) => {
 
 export const updateUserSchema = z.object({
   name: nameSchema.optional(),
-  avatarUrl: z.url('URL inválida').nullish(),
 });
 
 const PASSWORD_MIN_LENGTH = 8;
@@ -34,3 +33,7 @@ export const changePasswordSchema = z
       .max(PASSWORD_MAX_LENGTH, `A nova senha pode ter no máximo ${PASSWORD_MAX_LENGTH} caracteres`),
   })
   .strict();
+
+export const setAvatarSchema = z.object({
+  avatarUrl: z.url('Endereço de foto inválido'),
+});
