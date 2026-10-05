@@ -30,9 +30,11 @@ model Account {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  configuration Configuration?
-  profile       Profile?
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  configuration   Configuration?
+  profile         Profile?
+  ratingsGiven    Rating[]       @relation("RatingRater")
+  ratingsReceived Rating[]       @relation("RatingRated")
 
   @@map("account")
 }
@@ -58,4 +60,21 @@ model Profile {
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("profile")
+}
+
+model Rating {
+  id      Int @id @default(autoincrement())
+  raterId Int @map("rater_id")
+  ratedId Int @map("rated_id")
+  stars   Int @db.SmallInt
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+
+  rater Account @relation("RatingRater", fields: [raterId], references: [id], onDelete: Cascade)
+  rated Account @relation("RatingRated", fields: [ratedId], references: [id], onDelete: Cascade)
+
+  @@unique([raterId, ratedId])
+  @@index([ratedId])
+  @@map("rating")
 }

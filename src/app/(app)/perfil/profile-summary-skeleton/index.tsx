@@ -13,6 +13,7 @@ export function ProfileSummarySkeleton() {
         <div className="space-y-2">
           <Skeleton className={`h-5 w-40 ${themeClasses.skeleton}`} />
           <Skeleton className={`h-3.5 w-48 ${themeClasses.skeleton}`} />
+          <Skeleton className={`h-4 w-24 ${themeClasses.skeleton}`} />
         </div>
       </div>
 
