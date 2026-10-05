@@ -1,10 +1,12 @@
 'use client';
 
 import { useSession } from '@/src/core/auth/use-session';
+import { StarRating } from '@/src/core/components/star-rating';
 import { UserAvatar } from '@/src/core/components/user-avatar';
 import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
 import { useAccount } from '@/src/core/providers/account';
 import { getDisplayName } from '@/src/core/utils/get-display-name';
+import { pluralize } from '@/src/core/utils/pluralize';
 import { resolveAvatarUrl } from '@/src/core/utils/resolve-avatar-url';
 import { PROFILE_STATS } from '../constants';
 import { PhotoViewer } from '../photo-viewer';
@@ -33,12 +35,16 @@ export function ProfileSummary() {
           avatar
         )}
 
-        <div className="min-w-0 space-y-1">
+        <div className="min-w-0 flex flex-col gap-2">
           <h2 className="text-lg font-black m-0 truncate">{displayName}</h2>
           <p className={`text-xs ${themeClasses.subText}`}>
-            <span className="font-bold">{PROFILE_STATS.followers}</span> seguidores{' '}
-            <span className="font-bold">{PROFILE_STATS.following}</span> seguindo
+            <span className="font-bold">{PROFILE_STATS.followers}</span>{' '}
+            {pluralize(PROFILE_STATS.followers, 'seguidor', 'seguidores')}{' '}
+            <span className="font-bold">{PROFILE_STATS.following}</span> seguindo{' '}
+            <span className="font-bold">{PROFILE_STATS.ratingsCount}</span>{' '}
+            {pluralize(PROFILE_STATS.ratingsCount, 'avaliação', 'avaliações')}
           </p>
+          <StarRating value={PROFILE_STATS.rating} />
         </div>
       </div>
 
