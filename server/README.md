@@ -23,7 +23,7 @@ O servidor sobe em `http://localhost:3333`.
 | `DATABASE_URL`   | sim         | —      | String de conexão do PostgreSQL          |
 | `DATABASE_URL_UNPOOLED` | não  | —      | Conexão direta, usada só pelas migrations |
 | `JWT_SECRET`     | sim         | —      | Segredo usado para assinar os tokens     |
-| `JWT_EXPIRES_IN` | não         | `7d`   | Validade do token de acesso              |
+| `JWT_EXPIRES_IN` | não         | `15m`  | Validade do token de acesso (o refresh token renova) |
 | `PORT`           | não         | `3333` | Porta HTTP                               |
 | `CORS_ORIGIN`    | não         | `*`    | Origem liberada para o front             |
 
@@ -34,11 +34,13 @@ O servidor não sobe se `DATABASE_URL` ou `JWT_SECRET` estiverem ausentes.
 | Método | Rota             | Auth | Descrição                             |
 | ------ | ---------------- | ---- | ------------------------------------- |
 | GET    | `/health`        | não  | Verificação de disponibilidade        |
-| POST   | `/auth/register` | não  | Cria um usuário e devolve o token     |
-| POST   | `/auth/login`    | não  | Autentica e devolve o token           |
+| POST   | `/auth/register` | não  | Cria um usuário e devolve os tokens   |
+| POST   | `/auth/login`    | não  | Autentica e devolve os tokens         |
+| POST   | `/auth/refresh`  | não  | Troca o refresh token por tokens novos |
+| POST   | `/auth/logout`   | não  | Encerra a sessão do refresh token     |
 | GET    | `/user/me`       | sim  | Devolve o usuário dono do token       |
 | PATCH  | `/user/me`       | sim  | Atualiza `name` e/ou `avatarUrl`      |
-| PATCH  | `/user/me/password` | sim | Troca a senha (exige a senha atual; 5 tentativas a cada 15 min por usuário) |
+| PATCH  | `/user/me/password` | sim | Troca a senha (exige a senha atual; 5 tentativas a cada 15 min por usuário) e encerra as sessões dos outros aparelhos |
 | GET    | `/account/me`    | sim  | Devolve a conta e a configuração      |
 | PATCH  | `/account/me/configuration` | sim | Atualiza `theme`, `language` e/ou `notifications` |
 
@@ -47,20 +49,43 @@ Rotas autenticadas esperam o cabeçalho `Authorization: Bearer <token>`.
 ### POST /auth/register
 
 ```json
-{ "name": "Edson Souza", "email": "edson@scout.com", "password": "senha12345" }
+{ "name": "Edson Souza", "email": "edson@scout.com", "password": "senha12345", "remember": true }
 ```
 
-`201` devolve `{ user, accessToken }`. O e-mail é normalizado (sem espaços e em
+`201` devolve `{ user, accessToken, refreshToken }`. O e-mail é normalizado (sem espaços e em
 minúsculas) antes de ser gravado. Junto com o usuário é criada uma conta do tipo
 `player` com a configuração padrão (`light`, `pt`, notificações ligadas).
 
 ### POST /auth/login
 
 ```json
-{ "email": "edson@scout.com", "password": "senha12345" }
+{ "email": "edson@scout.com", "password": "senha12345", "remember": true }
 ```
 
-`200` devolve `{ user, accessToken }`.
+`200` devolve `{ user, accessToken, refreshToken }`. `remember` é opcional e vale
+`true` quando não vem.
+
+### Sessão e refresh token
+
+O login devolve dois tokens:
+
+- **`accessToken`**: JWT curto (`JWT_EXPIRES_IN`, 15 min por padrão), mandado no
+  `Authorization` das rotas autenticadas. Carrega o id da sessão em `sid`.
+- **`refreshToken`**: texto aleatório e opaco. O banco guarda só o hash dele na
+  tabela `session`, então dá para encerrar a sessão a qualquer momento.
+
+Quando o access token vence, o front chama `POST /auth/refresh` com
+`{ "refreshToken": "..." }` e recebe `{ accessToken, refreshToken }`. O refresh
+token é trocado a cada uso (o antigo deixa de valer) e a validade da sessão
+recomeça: 90 dias com `remember`, 1 dia sem. Quem usa o app não cai; quem fica
+esse tempo sem abrir precisa entrar de novo.
+
+Se um refresh token já trocado voltar a ser usado depois de 1 minuto, a API
+entende que ele vazou e encerra a sessão inteira. Dentro desse minuto o pedido só
+recebe `401`, porque duas abas renovando juntas mandam o mesmo token.
+
+`POST /auth/logout` com `{ "refreshToken": "..." }` encerra a sessão e responde
+`204`. Trocar a senha encerra todas as sessões do usuário menos a atual.
 
 ### PATCH /user/me
 
@@ -96,8 +121,11 @@ src/
 ├── auth/
 │   ├── routes.js
 │   ├── controller.js       entrada HTTP
-│   ├── service.js          regras de cadastro e autenticação
+│   ├── service.js          regras de cadastro, autenticação e emissão dos tokens
 │   └── schema.js           validação do corpo das requisições
+├── session/
+│   ├── constants.js        validade das sessões e folga de reuso do refresh token
+│   └── service.js          cria, renova (com rotação) e encerra sessões
 ├── account/
 │   └── constants.js        tipos de conta (player, team, organization, scout)
 ├── configuration/

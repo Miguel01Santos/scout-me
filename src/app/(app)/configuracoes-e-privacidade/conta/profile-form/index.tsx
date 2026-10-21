@@ -90,10 +90,10 @@ export function ProfileForm({ user }: ProfileFieldsProps) {
           label="Nome"
           inputClassName={themeClasses.input}
           value={name}
-          onChange={(event) => setName(event.target.value)}
+          onChange={setName}
           error={nameError ?? issues.find((issue) => issue.field === 'name')?.message}
           autoComplete="name"
-          disabled={!isEditing}
+          isDisabled={!isEditing}
           action={
             <button
               type="button"
@@ -109,8 +109,8 @@ export function ProfileForm({ user }: ProfileFieldsProps) {
           label="E-mail"
           inputClassName={themeClasses.input}
           value={user.email}
-          disabled
-          readOnly
+          isDisabled
+          isReadOnly
         />
       </div>
 

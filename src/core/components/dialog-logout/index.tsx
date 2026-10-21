@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import { DialogComponent } from "../../library/dialog";
-import { clearSession } from "../../auth";
+import { logoutUser } from "../../auth";
 import { useThemeClasses } from "../../hooks/use-theme-classes";
 import { DialogLogoutProps } from "./type";
 
@@ -10,7 +10,7 @@ export function DialogLogout({ isOpen, onOpenChange }: DialogLogoutProps) {
   const themeClasses = useThemeClasses();
 
   function logout() {
-    clearSession();
+    logoutUser();
     router.replace("/login");
   }
 

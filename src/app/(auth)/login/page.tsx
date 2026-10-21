@@ -7,11 +7,13 @@ import { ApiError } from '@/src/core/api';
 import { ApiIssue } from '@/src/core/api/type';
 import { loginUser, saveSession } from '@/src/core/auth';
 import { TextField } from '@/src/core/components/text-field';
+import { RememberMe } from '../remember-me';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [issues, setIssues] = useState<ApiIssue[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,9 +29,9 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const session = await loginUser({ email, password });
+      const session = await loginUser({ email, password, remember });
 
-      saveSession(session);
+      saveSession(session, { remember });
       router.replace('/home');
     } catch (error) {
       setErrorMessage(
@@ -48,7 +50,7 @@ export default function LoginPage() {
       <div>
         <h1 className="text-base font-black m-0 text-slate-100">Entrar</h1>
         <p className="text-[11px] text-slate-400 mt-0.5">
-          Acesse sua conta de olheiro para avaliar atletas.
+          Acesse sua conta
         </p>
       </div>
 
@@ -63,23 +65,25 @@ export default function LoginPage() {
           label="E-mail"
           type="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={setEmail}
           error={issueFor('email')}
-          placeholder="edson@scout.com"
+          placeholder="augustolima@gmail.com"
           autoComplete="email"
-          required
+          isRequired
         />
 
         <TextField
           label="Senha"
           type="password"
           value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={setPassword}
           error={issueFor('password')}
           placeholder="••••••••"
           autoComplete="current-password"
-          required
+          isRequired
         />
+
+        <RememberMe isSelected={remember} onChange={setRemember} />
       </div>
 
       <button

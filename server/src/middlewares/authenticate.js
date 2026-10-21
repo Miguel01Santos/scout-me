@@ -21,6 +21,7 @@ export function authenticate(request, response, next) {
   }
 
   request.userId = payload.sub;
+  request.sessionId = payload.sid;
 
   next();
 }

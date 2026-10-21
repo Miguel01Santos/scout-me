@@ -87,7 +87,7 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
           label="Nome do perfil"
           inputClassName={themeClasses.input}
           value={displayName}
-          onChange={(event) => setDisplayName(event.target.value)}
+          onChange={setDisplayName}
           error={nameError}
           placeholder={userName}
           autoComplete="off"
@@ -104,7 +104,7 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
           label="Descrição"
           inputClassName={themeClasses.input}
           value={bio}
-          onChange={(event) => setBio(event.target.value)}
+          onChange={setBio}
           error={bioError}
           counter={`${bio.length}/${BIO_MAX_LENGTH}`}
           rows={4}

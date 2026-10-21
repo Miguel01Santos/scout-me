@@ -89,7 +89,7 @@ function ResetPasswordFields() {
             type="password"
             inputClassName={themeClasses.input}
             value={currentPassword}
-            onChange={(event) => setCurrentPassword(event.target.value)}
+            onChange={setCurrentPassword}
             autoComplete="current-password"
           />
           <TextField
@@ -97,8 +97,8 @@ function ResetPasswordFields() {
             type="password"
             inputClassName={themeClasses.input}
             value={newPassword}
-            onChange={(event) => {
-              setNewPassword(event.target.value);
+            onChange={(value) => {
+              setNewPassword(value);
               setTouched((current) => ({ ...current, newPassword: true }));
             }}
             error={newPasswordError}
@@ -109,8 +109,8 @@ function ResetPasswordFields() {
             type="password"
             inputClassName={themeClasses.input}
             value={confirmPassword}
-            onChange={(event) => {
-              setConfirmPassword(event.target.value);
+            onChange={(value) => {
+              setConfirmPassword(value);
               setTouched((current) => ({ ...current, confirmPassword: true }));
             }}
             error={confirmPasswordError}

@@ -8,6 +8,7 @@ import { ApiIssue } from '@/src/core/api/type';
 import { registerUser, saveSession } from '@/src/core/auth';
 import { TextField } from '@/src/core/components/text-field';
 import { validateName } from '@/src/core/utils/validate-name';
+import { RememberMe } from '../remember-me';
 
 export default function RegistroPage() {
   const router = useRouter();
@@ -15,21 +16,32 @@ export default function RegistroPage() {
   const [isNameTouched, setIsNameTouched] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isConfirmPasswordTouched, setIsConfirmPasswordTouched] = useState(false);
+  const [remember, setRemember] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [issues, setIssues] = useState<ApiIssue[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const nameError = isNameTouched ? validateName(name) : undefined;
+  const passwordsMatch = confirmPassword === password;
+  const confirmPasswordError =
+    isConfirmPasswordTouched && !passwordsMatch ? 'As senhas não coincidem' : undefined;
 
   function issueFor(field: string) {
     return issues.find((issue) => issue.field === field)?.message;
   }
 
+  function clearIssue(field: string) {
+    setIssues((current) => current.filter((issue) => issue.field !== field));
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (validateName(name)) {
+    if (validateName(name) || !passwordsMatch) {
       setIsNameTouched(true);
+      setIsConfirmPasswordTouched(true);
       return;
     }
 
@@ -38,15 +50,22 @@ export default function RegistroPage() {
     setIsSubmitting(true);
 
     try {
-      const session = await registerUser({ name, email, password });
+      const session = await registerUser({ name, email, password, remember });
 
-      saveSession(session);
+      saveSession(session, { remember });
       router.replace('/home');
     } catch (error) {
+      const fieldIssues = error instanceof ApiError ? error.issues : [];
+
+      // Erro de campo aparece embaixo do campo; o banner fica para o que não é de nenhum campo.
       setErrorMessage(
-        error instanceof ApiError ? error.message : 'Erro inesperado. Tente novamente.'
+        fieldIssues.length > 0
+          ? ''
+          : error instanceof ApiError
+            ? error.message
+            : 'Erro inesperado. Tente novamente.'
       );
-      setIssues(error instanceof ApiError ? error.issues : []);
+      setIssues(fieldIssues);
       setIsSubmitting(false);
     }
   }
@@ -74,12 +93,12 @@ export default function RegistroPage() {
           label="Nome"
           type="text"
           value={name}
-          onChange={(event) => {
-            setName(event.target.value);
+          onChange={(value) => {
+            setName(value);
             setIsNameTouched(true);
           }}
           error={nameError ?? issueFor('name')}
-          placeholder="Edson Souza"
+          placeholder="Augusto Lima da Silva"
           autoComplete="name"
         />
 
@@ -87,23 +106,42 @@ export default function RegistroPage() {
           label="E-mail"
           type="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(value) => {
+            setEmail(value);
+            clearIssue('email');
+          }}
           error={issueFor('email')}
-          placeholder="edson@scout.com"
+          placeholder="augustolima@gmail.com"
           autoComplete="email"
-          required
+          isRequired
         />
 
         <TextField
           label="Senha"
           type="password"
           value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={setPassword}
           error={issueFor('password')}
           placeholder="mínimo de 8 caracteres"
           autoComplete="new-password"
-          required
+          isRequired
         />
+
+        <TextField
+          label="Confirmar senha"
+          type="password"
+          value={confirmPassword}
+          onChange={(value) => {
+            setConfirmPassword(value);
+            setIsConfirmPasswordTouched(true);
+          }}
+          error={confirmPasswordError}
+          placeholder="repita a senha"
+          autoComplete="new-password"
+          isRequired
+        />
+
+        <RememberMe isSelected={remember} onChange={setRemember} />
       </div>
 
       <button

@@ -1,8 +1,8 @@
 import { get, post } from '../api';
-import { clearCachedTheme } from '../utils/theme-cache';
+import { clearSession, getSession, saveSession } from '../utils/session-store';
 import { AuthSession, AuthUser, LoginInput, RegisterInput } from './type';
 
-const SESSION_KEY = 'scoutme.session';
+export { clearSession, getSession, saveSession };
 
 export function registerUser(input: RegisterInput) {
   return post<AuthSession>('/auth/register', input);
@@ -16,25 +16,13 @@ export function fetchLoggedUser(accessToken: string) {
   return get<{ user: AuthUser }>('/user/me', accessToken);
 }
 
-export function saveSession(session: AuthSession) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-}
+// O aparelho sai da conta na hora; avisar a API para encerrar a sessão é só melhor esforço.
+export function logoutUser() {
+  const refreshToken = getSession()?.refreshToken;
 
-export function getSession(): AuthSession | null {
-  const storedSession = localStorage.getItem(SESSION_KEY);
+  clearSession();
 
-  if (!storedSession) return null;
-
-  try {
-    return JSON.parse(storedSession) as AuthSession;
-  } catch {
-    return null;
-  }
-}
-
-export function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
-  clearCachedTheme();
+  if (refreshToken) post('/auth/logout', { refreshToken }).catch(() => undefined);
 }
 
 export function loginDevUser() {

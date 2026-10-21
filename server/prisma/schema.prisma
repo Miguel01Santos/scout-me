@@ -17,8 +17,27 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   accounts Account[]
+  sessions Session[]
 
   @@map("user")
+}
+
+model Session {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  tokenHash         String    @unique @map("token_hash")
+  previousTokenHash String?   @unique @map("previous_token_hash")
+  remember          Boolean
+  expiresAt         DateTime  @map("expires_at")
+  rotatedAt         DateTime? @map("rotated_at")
+  revokedAt         DateTime? @map("revoked_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
 }
 
 model Account {

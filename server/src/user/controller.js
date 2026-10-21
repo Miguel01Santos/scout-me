@@ -18,7 +18,7 @@ export async function update(request, response) {
 export async function updatePassword(request, response) {
   const data = changePasswordSchema.parse(request.body);
 
-  await changePassword(request.userId, data);
+  await changePassword(request.userId, request.sessionId, data);
 
   return response.status(204).send();
 }

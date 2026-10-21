@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs';
 import { prismaClient } from '../prisma.js';
 import { HttpError } from '../http-error.js';
 import { destroyAvatar, toOwnedAvatarPublicId } from '../cloudinary/service.js';
+import { revokeOtherSessions } from '../session/service.js';
 
 export function toPublicUser(user) {
   return {
@@ -33,7 +34,7 @@ export async function updateUser(userId, data) {
 
 const PASSWORD_SALT_ROUNDS = 10;
 
-export async function changePassword(userId, { currentPassword, newPassword }) {
+export async function changePassword(userId, currentSessionId, { currentPassword, newPassword }) {
   const user = await prismaClient.user.findUnique({ where: { id: userId } });
 
   if (!user) {
@@ -53,6 +54,9 @@ export async function changePassword(userId, { currentPassword, newPassword }) {
   const hashedPassword = await bcryptjs.hash(newPassword, PASSWORD_SALT_ROUNDS);
 
   await prismaClient.user.update({ where: { id: userId }, data: { password: hashedPassword } });
+
+  // Quem trocou a senha continua logado aqui; os outros aparelhos precisam entrar de novo.
+  await revokeOtherSessions(userId, currentSessionId);
 }
 
 async function discardPreviousAvatar(previousUrl, nextUrl) {
