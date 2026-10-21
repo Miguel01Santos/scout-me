@@ -53,7 +53,7 @@ export default function RegistroPage() {
       const session = await registerUser({ name, email, password, remember });
 
       saveSession(session, { remember });
-      router.replace('/home');
+      router.replace('/tipo-de-conta');
     } catch (error) {
       const fieldIssues = error instanceof ApiError ? error.issues : [];
 

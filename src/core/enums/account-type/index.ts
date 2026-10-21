@@ -5,6 +5,13 @@ export enum AccountType {
   SCOUT = 'scout',
 }
 
+// Mesma lista da API: Organization é plano pago e ainda não pode ser escolhida.
+export const FREE_ACCOUNT_TYPES: AccountType[] = [
+  AccountType.PLAYER,
+  AccountType.SCOUT,
+  AccountType.TEAM,
+];
+
 export const ACCOUNT_TYPE_NAME: Record<AccountType, string> = {
   [AccountType.PLAYER]: 'Player',
   [AccountType.TEAM]: 'Team',

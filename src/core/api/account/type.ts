@@ -4,7 +4,8 @@ import { Profile } from '../profile/type';
 
 export interface Account {
   id?: number;
-  type: AccountType;
+  // `null` até a pessoa escolher o tipo na tela que vem depois do cadastro.
+  type: AccountType | null;
   isPrivate?: boolean;
   configuration?: Configuration;
   profile?: Profile;

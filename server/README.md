@@ -43,6 +43,7 @@ O servidor não sobe se `DATABASE_URL` ou `JWT_SECRET` estiverem ausentes.
 | PATCH  | `/user/me/password` | sim | Troca a senha (exige a senha atual; 5 tentativas a cada 15 min por usuário) e encerra as sessões dos outros aparelhos |
 | GET    | `/account/me`    | sim  | Devolve a conta e a configuração      |
 | PATCH  | `/account/me/configuration` | sim | Atualiza `theme`, `language` e/ou `notifications` |
+| PUT    | `/account/me/type` | sim | Escolhe o tipo da conta (uma vez só, logo depois do cadastro) |
 
 Rotas autenticadas esperam o cabeçalho `Authorization: Bearer <token>`.
 
@@ -53,8 +54,9 @@ Rotas autenticadas esperam o cabeçalho `Authorization: Bearer <token>`.
 ```
 
 `201` devolve `{ user, accessToken, refreshToken }`. O e-mail é normalizado (sem espaços e em
-minúsculas) antes de ser gravado. Junto com o usuário é criada uma conta do tipo
-`player` com a configuração padrão (`light`, `pt`, notificações ligadas).
+minúsculas) antes de ser gravado. Junto com o usuário é criada uma conta **sem
+tipo** com a configuração padrão (`dark`, `pt`, notificações ligadas); o tipo é
+escolhido em seguida, em `PUT /account/me/type`.
 
 ### POST /auth/login
 
@@ -96,13 +98,25 @@ recebe `401`, porque duas abas renovando juntas mandam o mesmo token.
 Os dois campos são opcionais — manda só o que quiser mudar. `avatarUrl` aceita
 `null` para remover o avatar. `200` devolve `{ user }`.
 
+### PUT /account/me/type
+
+```json
+{ "type": "scout" }
+```
+
+`200` devolve `{ account }`. Aceita `player`, `scout` e `team`; `organization` é
+plano pago e responde `403`. Só funciona enquanto a conta ainda não tem tipo:
+depois disso responde `409`. Enquanto o tipo não é escolhido, `GET /account/me`
+devolve `type: null` e o front manda para a tela de escolha.
+
 ## Respostas de erro
 
 | Status | Quando                                             |
 | ------ | -------------------------------------------------- |
 | `401`  | Credenciais inválidas, token ausente ou expirado   |
+| `403`  | Tipo de conta pago escolhido no cadastro           |
 | `404`  | Rota ou usuário inexistente                        |
-| `409`  | E-mail já cadastrado                               |
+| `409`  | E-mail já cadastrado ou tipo de conta já escolhido |
 | `422`  | Corpo da requisição inválido (detalhado em `issues`) |
 | `500`  | Erro não tratado                                   |
 

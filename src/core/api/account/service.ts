@@ -1,4 +1,5 @@
-import { get, patch } from '../index';
+import { AccountType } from '../../enums/account-type';
+import { get, patch, put } from '../index';
 import { UpdateConfigurationInput } from '../configuration/type';
 import { UpdateProfileInput } from '../profile/type';
 import { Account, UpdateAccountInput } from './type';
@@ -9,6 +10,10 @@ export function getAccount(accessToken: string) {
 
 export function updateConfiguration(accessToken: string, input: UpdateConfigurationInput) {
   return patch<{ account: Account }>('/account/me/configuration', accessToken, input);
+}
+
+export function chooseAccountType(accessToken: string, type: AccountType) {
+  return put<{ account: Account }>('/account/me/type', accessToken, { type });
 }
 
 export function updateAccount(accessToken: string, input: UpdateAccountInput) {

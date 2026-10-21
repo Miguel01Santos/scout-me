@@ -51,9 +51,8 @@ export async function registerUser({ name, email, password, remember }) {
           name,
           email,
           password: hashedPassword,
-          accounts: {
-            create: { type: AccountType.PLAYER, configuration: { create: {} } },
-          },
+          // Sem tipo: a pessoa escolhe na tela que vem logo depois do cadastro.
+          accounts: { create: { configuration: { create: {} } } },
         },
       });
 

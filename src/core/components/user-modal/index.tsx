@@ -10,6 +10,7 @@ import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
 import { useThemeClasses } from "../../hooks/use-theme-classes";
+import { useAccount } from "../../providers/account";
 import { ShieldIcon } from "../../icons";
 import { UserModalProps } from "./type";
 
@@ -20,7 +21,8 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
   const router = useRouter();
   const themeClasses = useThemeClasses();
   const [user, setUser] = useState<User | null>(null);
-  const accountType = toAccountType(user?.account?.type);
+  const { account } = useAccount();
+  const accountType = toAccountType(account?.type);
 
   function navigateAfterClose(event: MouseEvent<HTMLAnchorElement>, href: string) {
     event.preventDefault();

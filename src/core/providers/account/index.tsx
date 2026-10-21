@@ -9,6 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   getAccount,
   updateAccount as saveAccount,
@@ -38,6 +39,7 @@ export const DEFAULT_CONFIGURATION: Configuration = {
 const AccountContext = createContext<AccountContextValue | null>(null);
 
 export function AccountProvider({ children }: AccountProviderProps) {
+  const router = useRouter();
   const [account, setAccount] = useState<Account | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const cachedTheme = useSyncExternalStore(subscribeToCachedTheme, getCachedTheme, () => null);
@@ -49,13 +51,22 @@ export function AccountProvider({ children }: AccountProviderProps) {
 
     loadAccount
       .then((loadedAccount) => {
+        // Conta sem tipo ainda não terminou o cadastro. O loading continua para a tela não piscar.
+        if (loadedAccount && !loadedAccount.type) {
+          router.replace('/tipo-de-conta');
+          return;
+        }
+
         setAccount(loadedAccount);
+        setIsLoading(false);
 
         if (loadedAccount?.configuration) saveCachedTheme(loadedAccount.configuration.theme);
       })
-      .catch(() => setAccount(null))
-      .finally(() => setIsLoading(false));
-  }, []);
+      .catch(() => {
+        setAccount(null);
+        setIsLoading(false);
+      });
+  }, [router]);
 
   const updateConfiguration = useCallback(async (input: UpdateConfigurationInput) => {
     const session = getSession();

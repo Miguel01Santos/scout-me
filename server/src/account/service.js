@@ -1,5 +1,6 @@
 import { prismaClient } from '../prisma.js';
 import { HttpError } from '../http-error.js';
+import { FREE_ACCOUNT_TYPES } from './constants.js';
 
 function toPublicConfiguration(configuration) {
   return {
@@ -48,6 +49,31 @@ export async function getAccount(userId) {
     configuration: toPublicConfiguration(configuration),
     profile: toPublicProfile(account.profile, account.user.avatarUrl),
   };
+}
+
+// A escolha acontece uma vez, logo depois do cadastro; trocar de tipo depois é outro fluxo.
+export async function chooseAccountType(userId, { type }) {
+  const account = await findAccountByUserId(userId);
+
+  if (account.type) {
+    throw new HttpError(409, 'O tipo da conta já foi escolhido');
+  }
+
+  if (!FREE_ACCOUNT_TYPES.includes(type)) {
+    throw new HttpError(403, 'Esse tipo de conta é pago e ainda não está disponível');
+  }
+
+  // O filtro por tipo vazio impede que dois pedidos ao mesmo tempo gravem tipos diferentes.
+  const { count } = await prismaClient.account.updateMany({
+    where: { id: account.id, type: null },
+    data: { type, updatedAt: new Date() },
+  });
+
+  if (count === 0) {
+    throw new HttpError(409, 'O tipo da conta já foi escolhido');
+  }
+
+  return getAccount(userId);
 }
 
 export async function updateConfiguration(userId, data) {

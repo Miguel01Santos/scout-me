@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Language, Theme } from '../configuration/constants.js';
+import { AccountType } from './constants.js';
 import { AvatarColor, BIO_MAX_LENGTH } from '../profile/constants.js';
 import { nameSchema } from '../user/schema.js';
 
@@ -7,6 +8,10 @@ export const updateConfigurationSchema = z.object({
   theme: z.enum(Object.values(Theme), 'Tema inválido').optional(),
   language: z.enum(Object.values(Language), 'Idioma inválido').optional(),
   notifications: z.boolean('Valor inválido').optional(),
+});
+
+export const chooseAccountTypeSchema = z.object({
+  type: z.enum(Object.values(AccountType), 'Tipo de conta inválido'),
 });
 
 export const updateAccountSchema = z.object({

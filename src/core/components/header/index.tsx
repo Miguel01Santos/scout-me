@@ -5,6 +5,7 @@ import { House, Search, Send } from 'lucide-react';
 import { useSession } from '../../auth/use-session';
 import { useThemeClasses } from '../../hooks/use-theme-classes';
 import { AvatarComponent } from '../../library/avatar';
+import { useAccount } from '../../providers/account';
 import { HeaderNav } from '../header-nav';
 import { HeaderNavItem } from '../header-nav/type';
 
@@ -16,6 +17,7 @@ const NAV_ITEMS: HeaderNavItem[] = [
 
 export function Header() {
   const { user } = useSession();
+  const { account } = useAccount();
   const themeClasses = useThemeClasses();
 
   return (
@@ -24,7 +26,7 @@ export function Header() {
         <AvatarComponent
           name={user.name}
           avatarUrl={user.avatarUrl}
-          accountType={user.account?.type}
+          accountType={account?.type}
         />
       ) : (
         <Skeleton className={`size-[35px] rounded-full ${themeClasses.skeleton}`} />
