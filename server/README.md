@@ -147,7 +147,8 @@ npm run studio          # abre o Prisma Studio
 
 ## Deploy
 
-A API roda na Vercel e o banco fica na Neon. O front é outro deploy, na Netlify.
+A API roda na Vercel e o banco fica na Neon. O front é outro projeto da Vercel
+(`scout-me`), no mesmo repositório.
 
 ### Vercel
 

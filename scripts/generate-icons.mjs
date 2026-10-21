@@ -67,9 +67,9 @@ await mkdir('public/icons', { recursive: true });
 // Favicon da aba do navegador (convenção `app/icon.svg` do Next).
 await writeFile('src/app/icon.svg', iconSvg({ rounded: true }));
 
-// `/favicon.ico` clássico (convenção `app/favicon.ico` do Next). Sem ele o
-// Netlify responde com o favicon dele, e alguns aparelhos usam esse arquivo
-// como ícone do app instalado.
+// `/favicon.ico` clássico (convenção `app/favicon.ico` do Next). Navegadores
+// pedem esse arquivo mesmo sem link no HTML, e alguns aparelhos usam ele como
+// ícone do app instalado.
 await ico(iconSvg({ rounded: true }), [16, 32, 48], 'src/app/favicon.ico');
 
 // Ícones "any" do manifest: cantos arredondados e transparentes.
