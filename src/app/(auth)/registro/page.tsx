@@ -6,8 +6,10 @@ import Link from 'next/link';
 import { ApiError } from '@/src/core/api';
 import { ApiIssue } from '@/src/core/api/type';
 import { registerUser, saveSession } from '@/src/core/auth';
+import { useRedirectLoggedUser } from '@/src/core/auth/use-redirect-logged-user';
 import { TextField } from '@/src/core/components/text-field';
 import { validateName } from '@/src/core/utils/validate-name';
+import { AuthFormSkeleton } from '../auth-form-skeleton';
 import { RememberMe } from '../remember-me';
 
 export default function RegistroPage() {
@@ -22,6 +24,7 @@ export default function RegistroPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [issues, setIssues] = useState<ApiIssue[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isChecking } = useRedirectLoggedUser();
 
   const nameError = isNameTouched ? validateName(name) : undefined;
   const passwordsMatch = confirmPassword === password;
@@ -69,6 +72,8 @@ export default function RegistroPage() {
       setIsSubmitting(false);
     }
   }
+
+  if (isChecking) return <AuthFormSkeleton fieldCount={4} />;
 
   return (
     <form

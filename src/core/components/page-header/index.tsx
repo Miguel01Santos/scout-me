@@ -4,10 +4,15 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeaderProps } from './type';
 
-export function PageHeader({ title, action }: PageHeaderProps) {
+export function PageHeader({ title, action, backHref }: PageHeaderProps) {
   const router = useRouter();
 
   function goBack() {
+    if (backHref) {
+      router.replace(backHref);
+      return;
+    }
+
     if (window.history.length > 1) {
       router.back();
       return;

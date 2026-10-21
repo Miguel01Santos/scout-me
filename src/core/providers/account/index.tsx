@@ -42,17 +42,24 @@ export function AccountProvider({ children }: AccountProviderProps) {
   const router = useRouter();
   const [account, setAccount] = useState<Account | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const cachedTheme = useSyncExternalStore(subscribeToCachedTheme, getCachedTheme, () => null);
 
   useEffect(() => {
-    const loadAccount = ensureSession().then((session) =>
-      session ? getAccount(session.accessToken).then((response) => response.account) : null
-    );
+    ensureSession()
+      .then(async (session) => {
+        // Sem sessão o app nem aparece: vai direto para o login, sem mostrar a home antes.
+        if (!session) {
+          router.replace('/login');
+          return;
+        }
 
-    loadAccount
-      .then((loadedAccount) => {
+        setIsAuthenticated(true);
+
+        const { account: loadedAccount } = await getAccount(session.accessToken);
+
         // Conta sem tipo ainda não terminou o cadastro. O loading continua para a tela não piscar.
-        if (loadedAccount && !loadedAccount.type) {
+        if (!loadedAccount.type) {
           router.replace('/tipo-de-conta');
           return;
         }
@@ -60,9 +67,15 @@ export function AccountProvider({ children }: AccountProviderProps) {
         setAccount(loadedAccount);
         setIsLoading(false);
 
-        if (loadedAccount?.configuration) saveCachedTheme(loadedAccount.configuration.theme);
+        if (loadedAccount.configuration) saveCachedTheme(loadedAccount.configuration.theme);
       })
       .catch(() => {
+        // A renovação do token falhou e a sessão foi apagada: volta para o login.
+        if (!getSession()) {
+          router.replace('/login');
+          return;
+        }
+
         setAccount(null);
         setIsLoading(false);
       });
@@ -137,6 +150,7 @@ export function AccountProvider({ children }: AccountProviderProps) {
       configuration:
         account?.configuration ?? { ...DEFAULT_CONFIGURATION, theme: cachedTheme ?? DEFAULT_CONFIGURATION.theme },
       isLoading,
+      isAuthenticated,
       updateConfiguration,
       updateAccount,
       updateProfile,
@@ -147,6 +161,7 @@ export function AccountProvider({ children }: AccountProviderProps) {
       account,
       cachedTheme,
       isLoading,
+      isAuthenticated,
       updateConfiguration,
       updateAccount,
       updateProfile,

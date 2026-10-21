@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSession } from '@/src/core/auth/use-session';
 import { TextAreaField } from '@/src/core/components/textarea-field';
 import { TextField } from '@/src/core/components/text-field';
@@ -16,6 +17,7 @@ import { DisplayNameSwitch } from '../display-name-switch';
 import { EditProfileSkeleton } from '../edit-profile-skeleton';
 
 function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUrl?: string | null }) {
+  const router = useRouter();
   const { account, updateProfile } = useAccount();
   const themeClasses = useThemeClasses();
   const savedProfile = account?.profile;
@@ -50,13 +52,13 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
         bio: bio.trim().length > 0 ? bio : null,
         avatarColor: color,
       });
-      setFeedback({ message: 'Perfil atualizado.', isError: false });
+      // O botão continua em "Salvando..." até a home abrir.
+      router.replace('/home');
     } catch (error) {
       setFeedback({
         message: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.',
         isError: true,
       });
-    } finally {
       setIsSubmitting(false);
     }
   }

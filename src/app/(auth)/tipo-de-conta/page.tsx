@@ -69,8 +69,8 @@ export default function TipoDeContaPage() {
 
     try {
       await chooseAccountType(session.accessToken, pendingType);
-      // push em vez de replace: o "voltar" da edição cai aqui, e esta tela manda para a home.
-      router.push('/perfil/editar');
+      // replace: esta tela sai do histórico, e o voltar da edição não passa mais por aqui.
+      router.replace('/perfil/editar?origem=tipo-de-conta');
     } catch (error) {
       setErrorMessage(
         error instanceof ApiError ? error.message : 'Erro inesperado. Tente novamente.'

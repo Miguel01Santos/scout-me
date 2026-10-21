@@ -11,6 +11,8 @@ export interface AccountContextValue {
   account: Account | null;
   configuration: Configuration;
   isLoading: boolean;
+  // Só fica true depois de confirmar que há sessão; até lá as páginas do app não aparecem.
+  isAuthenticated: boolean;
   updateConfiguration: (input: UpdateConfigurationInput) => Promise<void>;
   updateAccount: (input: UpdateAccountInput) => Promise<void>;
   updateProfile: (input: UpdateProfileInput) => Promise<void>;

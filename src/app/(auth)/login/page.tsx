@@ -6,7 +6,9 @@ import Link from 'next/link';
 import { ApiError } from '@/src/core/api';
 import { ApiIssue } from '@/src/core/api/type';
 import { loginUser, saveSession } from '@/src/core/auth';
+import { useRedirectLoggedUser } from '@/src/core/auth/use-redirect-logged-user';
 import { TextField } from '@/src/core/components/text-field';
+import { AuthFormSkeleton } from '../auth-form-skeleton';
 import { RememberMe } from '../remember-me';
 
 export default function LoginPage() {
@@ -17,6 +19,7 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [issues, setIssues] = useState<ApiIssue[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isChecking } = useRedirectLoggedUser();
 
   function issueFor(field: string) {
     return issues.find((issue) => issue.field === field)?.message;
@@ -41,6 +44,8 @@ export default function LoginPage() {
       setIsSubmitting(false);
     }
   }
+
+  if (isChecking) return <AuthFormSkeleton fieldCount={2} />;
 
   return (
     <form
