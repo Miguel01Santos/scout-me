@@ -25,7 +25,7 @@ O servidor sobe em `http://localhost:3333`.
 | `JWT_SECRET`     | sim         | —      | Segredo usado para assinar os tokens     |
 | `JWT_EXPIRES_IN` | não         | `15m`  | Validade do token de acesso (o refresh token renova) |
 | `PORT`           | não         | `3333` | Porta HTTP                               |
-| `CORS_ORIGIN`    | não         | `*`    | Origem liberada para o front             |
+| `CORS_ORIGIN`    | não         | `*`    | Origens liberadas para o front, separadas por vírgula |
 
 O servidor não sobe se `DATABASE_URL` ou `JWT_SECRET` estiverem ausentes.
 
@@ -149,6 +149,11 @@ npm run studio          # abre o Prisma Studio
 
 A API roda na Vercel e o banco fica na Neon. O front é outro projeto da Vercel
 (`scout-me`), no mesmo repositório.
+
+O navegador não chama a API direto: o front chama `/api/...` no próprio domínio e
+o `next.config.ts` repassa para o endereço em `API_URL` (variável do projeto do
+front). Por isso o `CORS_ORIGIN` não entra no caminho do app; ele só importa para
+quem chamar a API de outro site.
 
 ### Vercel
 

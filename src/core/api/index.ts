@@ -2,7 +2,7 @@ import { SessionTokens } from '../auth/type';
 import { clearSession, getSession, updateSessionTokens } from '../utils/session-store';
 import { ApiErrorBody, ApiIssue } from './type';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333';
+const API_URL = '/api';
 const REFRESH_LOCK_NAME = 'scoutme.refresh-session';
 
 export class ApiError extends Error {

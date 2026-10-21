@@ -1,10 +1,18 @@
 import type { NextConfig } from "next";
 
+if (process.env.VERCEL && !process.env.API_URL) {
+  throw new Error("Defina API_URL nas variáveis de ambiente do projeto na Vercel.");
+}
+
+const API_URL = (process.env.API_URL ?? "http://localhost:3333").replace(/\/+$/, "");
+
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [{ source: "/api/:path*", destination: `${API_URL}/:path*` }];
+  },
   async headers() {
     return [
       {
-        // O navegador precisa sempre buscar a versão nova do service worker.
         source: "/sw.js",
         headers: [
           { key: "Content-Type", value: "application/javascript; charset=utf-8" },

@@ -1,5 +1,3 @@
-// Service worker do ScoutMe PRO.
-// Troque a VERSION quando mudar este arquivo para limpar os caches antigos.
 const VERSION = 'v1';
 const STATIC_CACHE = `scoutme-static-${VERSION}`;
 const PAGES_CACHE = `scoutme-pages-${VERSION}`;
@@ -38,8 +36,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
-  // A API roda em outro domínio: deixa passar direto, sem cache.
-  if (url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
 
   // Páginas: tenta a rede primeiro e usa o cache só quando estiver offline.
   if (request.mode === 'navigate') {
