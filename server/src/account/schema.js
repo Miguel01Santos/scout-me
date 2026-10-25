@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Language, Theme } from '../configuration/constants.js';
+import { PlayerCategory, PlayerPosition, PreferredFoot } from '../player/constants.js';
 import { AccountType } from './constants.js';
 import { AvatarColor, BIO_MAX_LENGTH } from '../profile/constants.js';
 import { nameSchema } from '../user/schema.js';
@@ -13,6 +14,15 @@ export const updateConfigurationSchema = z.object({
 export const chooseAccountTypeSchema = z.object({
   type: z.enum(Object.values(AccountType), 'Tipo de conta inválido'),
 });
+
+// PUT completo: os três campos vêm sempre (null limpa). O strict recusa campos a mais.
+export const updatePlayerAttributesSchema = z
+  .object({
+    preferredFoot: z.enum(Object.values(PreferredFoot), 'Pé dominante inválido').nullable(),
+    position: z.enum(Object.values(PlayerPosition), 'Posição inválida').nullable(),
+    category: z.enum(Object.values(PlayerCategory), 'Categoria inválida').nullable(),
+  })
+  .strict();
 
 export const updateAccountSchema = z.object({
   isPrivate: z.boolean('Valor inválido'),

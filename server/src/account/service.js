@@ -1,6 +1,6 @@
 import { prismaClient } from '../prisma.js';
 import { HttpError } from '../http-error.js';
-import { FREE_ACCOUNT_TYPES } from './constants.js';
+import { AccountType, FREE_ACCOUNT_TYPES } from './constants.js';
 
 function toPublicConfiguration(configuration) {
   return {
@@ -20,11 +20,19 @@ function toPublicProfile(profile, avatarUrl) {
   };
 }
 
+function toPublicPlayerAttributes(attributes) {
+  return {
+    preferredFoot: attributes?.preferredFoot ?? null,
+    position: attributes?.position ?? null,
+    category: attributes?.category ?? null,
+  };
+}
+
 async function findAccountByUserId(userId) {
   const account = await prismaClient.account.findFirst({
     where: { userId },
     orderBy: { id: 'asc' },
-    include: { profile: true, user: { select: { avatarUrl: true } } },
+    include: { profile: true, playerAttributes: true, user: { select: { avatarUrl: true } } },
   });
 
   if (!account) {
@@ -48,7 +56,28 @@ export async function getAccount(userId) {
     isPrivate: account.isPrivate,
     configuration: toPublicConfiguration(configuration),
     profile: toPublicProfile(account.profile, account.user.avatarUrl),
+    // Só existe para Player; nos outros tipos vem null.
+    playerAttributes:
+      account.type === AccountType.PLAYER ? toPublicPlayerAttributes(account.playerAttributes) : null,
   };
+}
+
+// O token decide de qual conta são os atributos (nada de id vindo do front), e só Player
+// pode ter atributos, mesmo que outro tipo chame a rota direto.
+export async function updatePlayerAttributes(userId, data) {
+  const account = await findAccountByUserId(userId);
+
+  if (account.type !== AccountType.PLAYER) {
+    throw new HttpError(403, 'Atributos são exclusivos de contas Player');
+  }
+
+  await prismaClient.playerAttributes.upsert({
+    where: { accountId: account.id },
+    update: { ...data, updatedAt: new Date() },
+    create: { accountId: account.id, ...data },
+  });
+
+  return getAccount(userId);
 }
 
 // A escolha acontece uma vez, logo depois do cadastro; trocar de tipo depois é outro fluxo.

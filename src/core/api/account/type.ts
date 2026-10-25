@@ -1,5 +1,6 @@
 import { AccountType } from '../../enums/account-type';
 import { Configuration } from '../configuration/type';
+import { PlayerAttributes } from '../player-attributes/type';
 import { Profile } from '../profile/type';
 
 export interface Account {
@@ -9,6 +10,8 @@ export interface Account {
   isPrivate?: boolean;
   configuration?: Configuration;
   profile?: Profile;
+  // Só vem preenchido em conta Player; nos outros tipos é null.
+  playerAttributes?: PlayerAttributes | null;
 }
 
 export interface UpdateAccountInput {

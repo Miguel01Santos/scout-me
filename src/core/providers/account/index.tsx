@@ -13,12 +13,14 @@ import { useRouter } from 'next/navigation';
 import {
   getAccount,
   updateAccount as saveAccount,
+  updatePlayerAttributes as savePlayerAttributes,
   updateProfile as saveProfile,
   updateConfiguration as saveConfiguration,
 } from '../../api/account/service';
 import { Account, UpdateAccountInput } from '../../api/account/type';
 import { deleteAvatar, uploadAvatar } from '../../api/avatar/service';
 import { Configuration, UpdateConfigurationInput } from '../../api/configuration/type';
+import { UpdatePlayerAttributesInput } from '../../api/player-attributes/type';
 import { UpdateProfileInput } from '../../api/profile/type';
 import { clearSession, ensureSession, getSession, syncSessionState } from '../../auth';
 import { Language } from '../../enums/language';
@@ -119,6 +121,16 @@ export function AccountProvider({ children }: AccountProviderProps) {
     setAccount(response.account);
   }, []);
 
+  const updatePlayerAttributes = useCallback(async (input: UpdatePlayerAttributesInput) => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    const response = await savePlayerAttributes(session.accessToken, input);
+
+    setAccount(response.account);
+  }, []);
+
   const refreshAccount = useCallback(async () => {
     const session = getSession();
 
@@ -160,6 +172,7 @@ export function AccountProvider({ children }: AccountProviderProps) {
       updateConfiguration,
       updateAccount,
       updateProfile,
+      updatePlayerAttributes,
       changeAvatar,
       removeAvatar,
     }),
@@ -171,6 +184,7 @@ export function AccountProvider({ children }: AccountProviderProps) {
       updateConfiguration,
       updateAccount,
       updateProfile,
+      updatePlayerAttributes,
       changeAvatar,
       removeAvatar,
     ]

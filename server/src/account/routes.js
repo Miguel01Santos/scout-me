@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { me, update, updateMe, updateMyProfile, updateMyType } from './controller.js';
+import {
+  me,
+  update,
+  updateMe,
+  updateMyPlayerAttributes,
+  updateMyProfile,
+  updateMyType,
+} from './controller.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
 export const accountRouter = Router();
@@ -9,3 +16,4 @@ accountRouter.patch('/me', authenticate, updateMe);
 accountRouter.patch('/me/configuration', authenticate, update);
 accountRouter.patch('/me/profile', authenticate, updateMyProfile);
 accountRouter.put('/me/type', authenticate, updateMyType);
+accountRouter.put('/me/player-attributes', authenticate, updateMyPlayerAttributes);

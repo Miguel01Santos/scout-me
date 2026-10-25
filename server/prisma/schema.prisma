@@ -49,11 +49,12 @@ model Account {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
 
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  configuration   Configuration?
-  profile         Profile?
-  ratingsGiven    Rating[]       @relation("RatingRater")
-  ratingsReceived Rating[]       @relation("RatingRated")
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  configuration    Configuration?
+  profile          Profile?
+  playerAttributes PlayerAttributes?
+  ratingsGiven     Rating[]          @relation("RatingRater")
+  ratingsReceived  Rating[]          @relation("RatingRated")
 
   @@map("account")
 }
@@ -79,6 +80,22 @@ model Profile {
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("profile")
+}
+
+// Só para contas Player. Os valores aceitos ficam em src/player/constants.js e também
+// travados no banco por CHECK (ver a migration create_player_attributes).
+model PlayerAttributes {
+  accountId     Int     @id @map("account_id")
+  preferredFoot String? @map("preferred_foot")
+  position      String?
+  category      String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("player_attributes")
 }
 
 model Rating {

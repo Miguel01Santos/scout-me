@@ -11,7 +11,10 @@ export function ProfileSummarySkeleton() {
       <div className="flex items-center gap-4">
         <Skeleton className={`size-24 shrink-0 rounded-full ${themeClasses.skeleton}`} />
         <div className="space-y-2">
-          <Skeleton className={`h-5 w-40 ${themeClasses.skeleton}`} />
+          <div className="flex items-center gap-2">
+            <Skeleton className={`h-5 w-32 ${themeClasses.skeleton}`} />
+            <Skeleton className={`h-5 w-14 rounded-full ${themeClasses.skeleton}`} />
+          </div>
           <Skeleton className={`h-3.5 w-48 ${themeClasses.skeleton}`} />
           <Skeleton className={`h-4 w-24 ${themeClasses.skeleton}`} />
         </div>

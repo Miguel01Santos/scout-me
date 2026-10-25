@@ -44,6 +44,7 @@ O servidor não sobe se `DATABASE_URL` ou `JWT_SECRET` estiverem ausentes.
 | GET    | `/account/me`    | sim  | Devolve a conta e a configuração      |
 | PATCH  | `/account/me/configuration` | sim | Atualiza `theme`, `language` e/ou `notifications` |
 | PUT    | `/account/me/type` | sim | Escolhe o tipo da conta (uma vez só, logo depois do cadastro) |
+| PUT    | `/account/me/player-attributes` | sim | Grava pé dominante, posição e categoria (só contas Player) |
 
 Rotas autenticadas esperam o cabeçalho `Authorization: Bearer <token>`.
 
@@ -109,12 +110,31 @@ plano pago e responde `403`. Só funciona enquanto a conta ainda não tem tipo:
 depois disso responde `409`. Enquanto o tipo não é escolhido, `GET /account/me`
 devolve `type: null` e o front manda para a tela de escolha.
 
+### PUT /account/me/player-attributes
+
+```json
+{ "preferredFoot": "left", "position": "left_winger", "category": "u15" }
+```
+
+`200` devolve `{ account }`, com os atributos em `account.playerAttributes`. Os três
+campos são obrigatórios no corpo e aceitam `null` para limpar; campo a mais responde
+`422`. Valores aceitos (em `src/player/constants.js`, e travados no banco por CHECK):
+
+- `preferredFoot`: `right`, `left`, `both`
+- `position`: `goalkeeper`, `center_back`, `left_back`, `right_back`,
+  `defensive_midfielder`, `midfielder`, `right_midfielder`, `left_midfielder`,
+  `winger`, `right_winger`, `left_winger`, `striker`, `second_striker`
+- `category`: `u7`, `u9`, `u11`, `u13`, `u15`, `u17`, `u20`, `u23`
+
+Só contas Player: os outros tipos recebem `403`, e no `GET /account/me` o campo
+`playerAttributes` vem `null` para eles.
+
 ## Respostas de erro
 
 | Status | Quando                                             |
 | ------ | -------------------------------------------------- |
 | `401`  | Credenciais inválidas, token ausente ou expirado   |
-| `403`  | Tipo de conta pago escolhido no cadastro           |
+| `403`  | Tipo de conta pago no cadastro, ou atributos numa conta que não é Player |
 | `404`  | Rota ou usuário inexistente                        |
 | `409`  | E-mail já cadastrado ou tipo de conta já escolhido |
 | `422`  | Corpo da requisição inválido (detalhado em `issues`) |

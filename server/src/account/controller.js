@@ -2,6 +2,7 @@ import {
   chooseAccountTypeSchema,
   updateAccountSchema,
   updateConfigurationSchema,
+  updatePlayerAttributesSchema,
   updateProfileSchema,
 } from './schema.js';
 import {
@@ -9,6 +10,7 @@ import {
   getAccount,
   updateAccount,
   updateConfiguration,
+  updatePlayerAttributes,
   updateProfile,
 } from './service.js';
 
@@ -35,6 +37,13 @@ export async function updateMe(request, response) {
 export async function updateMyType(request, response) {
   const data = chooseAccountTypeSchema.parse(request.body);
   const account = await chooseAccountType(request.userId, data);
+
+  return response.status(200).json({ account });
+}
+
+export async function updateMyPlayerAttributes(request, response) {
+  const data = updatePlayerAttributesSchema.parse(request.body);
+  const account = await updatePlayerAttributes(request.userId, data);
 
   return response.status(200).json({ account });
 }
