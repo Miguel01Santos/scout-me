@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ApiError } from '@/src/core/api';
 import { ApiIssue } from '@/src/core/api/type';
-import { registerUser, saveSession } from '@/src/core/auth';
+import { registerUser, saveSession, saveSessionState } from '@/src/core/auth';
+import { SessionState } from '@/src/core/enums/session-state';
 import { useRedirectLoggedUser } from '@/src/core/auth/use-redirect-logged-user';
 import { TextField } from '@/src/core/components/text-field';
 import { validateName } from '@/src/core/utils/validate-name';
@@ -56,6 +57,8 @@ export default function RegistroPage() {
       const session = await registerUser({ name, email, password, remember });
 
       saveSession(session, { remember });
+      // Conta nova nasce sem tipo.
+      saveSessionState(SessionState.PENDING_ACCOUNT_TYPE);
       router.replace('/tipo-de-conta');
     } catch (error) {
       const fieldIssues = error instanceof ApiError ? error.issues : [];

@@ -1,7 +1,10 @@
 import { AuthSession, SaveSessionOptions, SessionTokens } from '../../auth/type';
+import { SESSION_STATE_COOKIE, SessionState } from '../../enums/session-state';
 import { clearCachedTheme } from '../theme-cache';
 
 const SESSION_KEY = 'scoutme.session';
+// Mesma validade da sessão com "Lembre-me" na API.
+const SESSION_STATE_MAX_AGE_SECONDS = 90 * 24 * 60 * 60;
 
 function storageWithSession(): Storage | null {
   if (localStorage.getItem(SESSION_KEY)) return localStorage;
@@ -39,8 +42,20 @@ export function updateSessionTokens(tokens: SessionTokens) {
   storage.setItem(SESSION_KEY, JSON.stringify({ ...session, ...tokens }));
 }
 
+// Acompanha o storage da sessão: com "Lembre-me" o cookie dura 90 dias; sem, some junto
+// com o navegador, como o sessionStorage.
+export function saveSessionState(state: SessionState) {
+  const attributes = ['Path=/', 'SameSite=Lax'];
+
+  if (localStorage.getItem(SESSION_KEY)) attributes.push(`Max-Age=${SESSION_STATE_MAX_AGE_SECONDS}`);
+  if (window.location.protocol === 'https:') attributes.push('Secure');
+
+  document.cookie = `${SESSION_STATE_COOKIE}=${state}; ${attributes.join('; ')}`;
+}
+
 export function clearSession() {
   localStorage.removeItem(SESSION_KEY);
   sessionStorage.removeItem(SESSION_KEY);
+  document.cookie = `${SESSION_STATE_COOKIE}=; Path=/; Max-Age=0`;
   clearCachedTheme();
 }

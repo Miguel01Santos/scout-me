@@ -20,7 +20,7 @@ import { Account, UpdateAccountInput } from '../../api/account/type';
 import { deleteAvatar, uploadAvatar } from '../../api/avatar/service';
 import { Configuration, UpdateConfigurationInput } from '../../api/configuration/type';
 import { UpdateProfileInput } from '../../api/profile/type';
-import { ensureSession, getSession } from '../../auth';
+import { clearSession, ensureSession, getSession, syncSessionState } from '../../auth';
 import { Language } from '../../enums/language';
 import { Theme } from '../../enums/theme';
 import {
@@ -49,7 +49,9 @@ export function AccountProvider({ children }: AccountProviderProps) {
     ensureSession()
       .then(async (session) => {
         // Sem sessão o app nem aparece: vai direto para o login, sem mostrar a home antes.
+        // O clearSession apaga um cookie de navegação que tenha sobrado.
         if (!session) {
+          clearSession();
           router.replace('/login');
           return;
         }
@@ -57,6 +59,9 @@ export function AccountProvider({ children }: AccountProviderProps) {
         setIsAuthenticated(true);
 
         const { account: loadedAccount } = await getAccount(session.accessToken);
+
+        // Também cobre quem já estava logado antes de o cookie existir.
+        syncSessionState(loadedAccount);
 
         // Conta sem tipo ainda não terminou o cadastro. O loading continua para a tela não piscar.
         if (!loadedAccount.type) {
@@ -72,6 +77,7 @@ export function AccountProvider({ children }: AccountProviderProps) {
       .catch(() => {
         // A renovação do token falhou e a sessão foi apagada: volta para o login.
         if (!getSession()) {
+          clearSession();
           router.replace('/login');
           return;
         }

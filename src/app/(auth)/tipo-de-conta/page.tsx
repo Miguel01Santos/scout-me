@@ -4,8 +4,15 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ApiError } from '@/src/core/api';
 import { chooseAccountType, getAccount } from '@/src/core/api/account/service';
-import { ensureSession, getSession } from '@/src/core/auth';
+import {
+  ensureSession,
+  getSession,
+  logoutUser,
+  saveSessionState,
+  syncSessionState,
+} from '@/src/core/auth';
 import { AccountType } from '@/src/core/enums/account-type';
+import { SessionState } from '@/src/core/enums/session-state';
 import { Language } from '@/src/core/enums/language';
 import { AccountTypeCard } from './account-type-card';
 import { AccountTypeSkeleton } from './account-type-skeleton';
@@ -33,6 +40,8 @@ export default function TipoDeContaPage() {
 
         const { account } = await getAccount(session.accessToken);
 
+        syncSessionState(account);
+
         if (account.type) {
           router.replace('/home');
           return;
@@ -59,6 +68,12 @@ export default function TipoDeContaPage() {
     setIsConfirmOpen(true);
   }
 
+  // Saída para quem entrou com a conta errada: sem isso, só daria para sair escolhendo um tipo.
+  function handleLogout() {
+    logoutUser();
+    router.replace('/login');
+  }
+
   async function handleConfirm() {
     const session = getSession();
 
@@ -69,6 +84,7 @@ export default function TipoDeContaPage() {
 
     try {
       await chooseAccountType(session.accessToken, pendingType);
+      saveSessionState(SessionState.READY);
       // replace: esta tela sai do histórico, e o voltar da edição não passa mais por aqui.
       router.replace('/perfil/editar?origem=tipo-de-conta');
     } catch (error) {
@@ -113,6 +129,18 @@ export default function TipoDeContaPage() {
           ))}
         </div>
       )}
+
+      <p className="text-[11px] text-slate-400 text-center">
+        Entrou com a conta errada?{' '}
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isSaving}
+          className="font-bold text-indigo-400 hover:text-indigo-300 disabled:opacity-50 cursor-pointer"
+        >
+          Sair da conta
+        </button>
+      </p>
 
       <ConfirmAccountTypeDialog
         isOpen={isConfirmOpen}

@@ -1,8 +1,20 @@
 import { get, post } from '../api';
-import { clearSession, getSession, saveSession } from '../utils/session-store';
+import { Account } from '../api/account/type';
+import { SessionState } from '../enums/session-state';
+import { clearSession, getSession, saveSession, saveSessionState } from '../utils/session-store';
 import { AuthSession, AuthUser, LoginInput, RegisterInput } from './type';
 
-export { clearSession, getSession, saveSession };
+export { clearSession, getSession, saveSession, saveSessionState };
+
+// Primeira tela depois de entrar: a escolha do tipo, se o cadastro ainda não terminou.
+export function landingPathFor(account: Account) {
+  return account.type ? '/home' : '/tipo-de-conta';
+}
+
+// Deixa o cookie de navegação igual à conta, para o proxy.ts mandar para a tela certa.
+export function syncSessionState(account: Account) {
+  saveSessionState(account.type ? SessionState.READY : SessionState.PENDING_ACCOUNT_TYPE);
+}
 
 export function registerUser(input: RegisterInput) {
   return post<AuthSession>('/auth/register', input);

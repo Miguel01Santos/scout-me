@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ApiError } from '@/src/core/api';
 import { ApiIssue } from '@/src/core/api/type';
-import { loginUser, saveSession } from '@/src/core/auth';
+import { getAccount } from '@/src/core/api/account/service';
+import { landingPathFor, loginUser, saveSession, syncSessionState } from '@/src/core/auth';
 import { useRedirectLoggedUser } from '@/src/core/auth/use-redirect-logged-user';
 import { TextField } from '@/src/core/components/text-field';
 import { AuthFormSkeleton } from '../auth-form-skeleton';
@@ -35,7 +36,12 @@ export default function LoginPage() {
       const session = await loginUser({ email, password, remember });
 
       saveSession(session, { remember });
-      router.replace('/home');
+
+      // Já abre a tela certa: a home, ou a escolha do tipo se o cadastro não terminou.
+      const { account } = await getAccount(session.accessToken);
+
+      syncSessionState(account);
+      router.replace(landingPathFor(account));
     } catch (error) {
       setErrorMessage(
         error instanceof ApiError ? error.message : 'Erro inesperado. Tente novamente.'
