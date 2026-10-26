@@ -85,8 +85,13 @@ export default function TipoDeContaPage() {
     try {
       await chooseAccountType(session.accessToken, pendingType);
       saveSessionState(SessionState.READY);
-      // replace: esta tela sai do histórico, e o voltar da edição não passa mais por aqui.
-      router.replace('/perfil/editar?origem=tipo-de-conta');
+      // replace: esta tela sai do histórico, e o voltar da próxima tela não passa mais por aqui.
+      // O Player preenche os atributos antes; os outros tipos vão direto para a edição do perfil.
+      router.replace(
+        pendingType === AccountType.PLAYER
+          ? '/perfil/atributos?origem=tipo-de-conta'
+          : '/perfil/editar?origem=tipo-de-conta'
+      );
     } catch (error) {
       setErrorMessage(
         error instanceof ApiError ? error.message : 'Erro inesperado. Tente novamente.'

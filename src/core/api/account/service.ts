@@ -1,5 +1,6 @@
 import { AccountType } from '../../enums/account-type';
-import { get, patch, put } from '../index';
+import { del, get, patch, postAuthenticated, put } from '../index';
+import { FollowRequest } from '../profiles/type';
 import { UpdateConfigurationInput } from '../configuration/type';
 import { UpdatePlayerAttributesInput } from '../player-attributes/type';
 import { UpdateProfileInput } from '../profile/type';
@@ -19,6 +20,24 @@ export function chooseAccountType(accessToken: string, type: AccountType) {
 
 export function updateAccount(accessToken: string, input: UpdateAccountInput) {
   return patch<{ account: Account }>('/account/me', accessToken, input);
+}
+
+export function getFollowRequests(accessToken: string) {
+  return get<{ requests: FollowRequest[] }>('/account/me/follow-requests', accessToken);
+}
+
+export function acceptFollowRequest(accessToken: string, username: string) {
+  return postAuthenticated<{ account: Account }>(
+    `/account/me/follow-requests/${encodeURIComponent(username)}`,
+    accessToken
+  );
+}
+
+export function declineFollowRequest(accessToken: string, username: string) {
+  return del<{ account: Account }>(
+    `/account/me/follow-requests/${encodeURIComponent(username)}`,
+    accessToken
+  );
 }
 
 export function updatePlayerAttributes(accessToken: string, input: UpdatePlayerAttributesInput) {

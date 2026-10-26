@@ -31,7 +31,7 @@ export function AccountVisibility() {
 
   if (!user || isLoading) return <AccountVisibilitySkeleton />;
 
-  const isPrivate = account?.isPrivate ?? true;
+  const isPrivate = account?.isPrivate ?? false;
 
   return (
     <section className={`p-4 border rounded-2xl space-y-3 ${themeClasses.card}`}>

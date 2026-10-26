@@ -11,6 +11,8 @@ import {
 } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  acceptFollowRequest as saveFollowRequestAcceptance,
+  declineFollowRequest as saveFollowRequestDecline,
   getAccount,
   updateAccount as saveAccount,
   updatePlayerAttributes as savePlayerAttributes,
@@ -131,6 +133,26 @@ export function AccountProvider({ children }: AccountProviderProps) {
     setAccount(response.account);
   }, []);
 
+  const acceptFollowRequest = useCallback(async (username: string) => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    const response = await saveFollowRequestAcceptance(session.accessToken, username);
+
+    setAccount(response.account);
+  }, []);
+
+  const declineFollowRequest = useCallback(async (username: string) => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    const response = await saveFollowRequestDecline(session.accessToken, username);
+
+    setAccount(response.account);
+  }, []);
+
   const refreshAccount = useCallback(async () => {
     const session = getSession();
 
@@ -173,6 +195,8 @@ export function AccountProvider({ children }: AccountProviderProps) {
       updateAccount,
       updateProfile,
       updatePlayerAttributes,
+      acceptFollowRequest,
+      declineFollowRequest,
       changeAvatar,
       removeAvatar,
     }),
@@ -185,6 +209,8 @@ export function AccountProvider({ children }: AccountProviderProps) {
       updateAccount,
       updateProfile,
       updatePlayerAttributes,
+      acceptFollowRequest,
+      declineFollowRequest,
       changeAvatar,
       removeAvatar,
     ]

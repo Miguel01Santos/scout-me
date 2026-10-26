@@ -7,6 +7,7 @@ import { HttpError } from '../http-error.js';
 import { toPublicUser } from '../user/service.js';
 import { AccountType } from '../account/constants.js';
 import { createSession, revokeSession, rotateSession } from '../session/service.js';
+import { generateUniqueUsername } from '../account/username.js';
 
 const PASSWORD_SALT_ROUNDS = 10;
 const EMAIL_TAKEN_MESSAGE = 'Já existe um usuário com esse e-mail';
@@ -46,21 +47,27 @@ export async function registerUser({ name, email, password, remember }) {
   try {
     // Se a sessão falhar, o usuário também não fica criado e o cadastro pode ser refeito.
     return await prismaClient.$transaction(async (transaction) => {
+      const username = await generateUniqueUsername(name, transaction);
       const user = await transaction.user.create({
         data: {
           name,
           email,
           password: hashedPassword,
           // Sem tipo: a pessoa escolhe na tela que vem logo depois do cadastro.
-          accounts: { create: { configuration: { create: {} } } },
+          accounts: { create: { username, configuration: { create: {} } } },
         },
       });
 
       return startSession(user, { remember }, transaction);
     });
   } catch (error) {
-    // Dois cadastros simultâneos com o mesmo e-mail passam pela checagem acima; o índice único barra o segundo.
-    if (error.code === UNIQUE_CONSTRAINT_ERROR) throw emailTakenError();
+    if (error.code === UNIQUE_CONSTRAINT_ERROR) {
+      const emailTaken = await prismaClient.user.findUnique({ where: { email } });
+
+      if (emailTaken) throw emailTakenError();
+
+      throw new HttpError(409, 'Não foi possível criar a conta agora. Tente novamente.');
+    }
 
     throw error;
   }
@@ -103,7 +110,11 @@ export async function loginDevUser() {
         email: DEV_USER_EMAIL,
         password: await bcryptjs.hash(randomUUID(), PASSWORD_SALT_ROUNDS),
         accounts: {
-          create: { type: AccountType.PLAYER, configuration: { create: {} } },
+          create: {
+            username: await generateUniqueUsername('Dev Local'),
+            type: AccountType.PLAYER,
+            configuration: { create: {} },
+          },
         },
       },
     }));

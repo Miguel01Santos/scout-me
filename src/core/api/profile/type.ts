@@ -8,4 +8,4 @@ export interface Profile {
   avatarColor: AvatarColor | null;
 }
 
-export type UpdateProfileInput = Partial<Omit<Profile, 'avatarUrl'>>;
+export type UpdateProfileInput = Partial<Omit<Profile, 'avatarUrl'>> & { username?: string };

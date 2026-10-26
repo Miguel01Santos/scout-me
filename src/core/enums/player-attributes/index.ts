@@ -53,6 +53,11 @@ export interface PlayerAttributesText {
   placeholder: string;
   save: string;
   saving: string;
+  // Usados logo depois de escolher o tipo Player.
+  onboardingTitle: string;
+  onboardingHint: string;
+  finish: string;
+  skip: string;
   preferredFoot: AttributeText<PreferredFoot>;
   position: AttributeText<PlayerPosition>;
   category: AttributeText<PlayerCategory>;
@@ -66,6 +71,10 @@ export const PLAYER_ATTRIBUTES_TEXT: Record<Language, PlayerAttributesText> = {
     placeholder: 'Selecione',
     save: 'Salvar',
     saving: 'Salvando...',
+    onboardingTitle: 'Seus atributos',
+    onboardingHint: 'Conte um pouco do seu jogo. Se preferir, dá para preencher depois.',
+    finish: 'Concluir',
+    skip: 'Pular',
     preferredFoot: {
       label: 'Pé dominante',
       values: {
@@ -113,6 +122,10 @@ export const PLAYER_ATTRIBUTES_TEXT: Record<Language, PlayerAttributesText> = {
     placeholder: 'Select',
     save: 'Save',
     saving: 'Saving...',
+    onboardingTitle: 'Your attributes',
+    onboardingHint: 'Tell us a bit about your game. You can also fill this in later.',
+    finish: 'Finish',
+    skip: 'Skip',
     preferredFoot: {
       label: 'Preferred foot',
       values: {
@@ -160,6 +173,10 @@ export const PLAYER_ATTRIBUTES_TEXT: Record<Language, PlayerAttributesText> = {
     placeholder: 'Selecciona',
     save: 'Guardar',
     saving: 'Guardando...',
+    onboardingTitle: 'Tus atributos',
+    onboardingHint: 'Cuéntanos un poco de tu juego. Si prefieres, puedes completarlo después.',
+    finish: 'Finalizar',
+    skip: 'Omitir',
     preferredFoot: {
       label: 'Pie dominante',
       values: {

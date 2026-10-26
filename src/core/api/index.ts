@@ -7,11 +7,13 @@ const REFRESH_LOCK_NAME = 'scoutme.refresh-session';
 
 export class ApiError extends Error {
   readonly issues: ApiIssue[];
+  readonly status: number | null;
 
-  constructor(message: string, issues: ApiIssue[] = []) {
+  constructor(message: string, issues: ApiIssue[] = [], status: number | null = null) {
     super(message);
     this.name = 'ApiError';
     this.issues = issues;
+    this.status = status;
   }
 }
 
@@ -97,7 +99,7 @@ async function request<TResponse>(
     | null;
 
   if (!response.ok) {
-    throw new ApiError(data?.message ?? 'Erro inesperado', data?.issues ?? []);
+    throw new ApiError(data?.message ?? 'Erro inesperado', data?.issues ?? [], response.status);
   }
 
   return data as TResponse;

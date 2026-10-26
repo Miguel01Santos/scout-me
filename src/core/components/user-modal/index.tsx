@@ -77,9 +77,13 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
                 <ShieldCheck size={18} />
                 Meu plano
               </span>
-              <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
-                {ACCOUNT_TYPE_NAME[accountType]}
-              </Chip>
+              {accountType ? (
+                <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
+                  {ACCOUNT_TYPE_NAME[accountType]}
+                </Chip>
+              ) : (
+                <Skeleton className="h-6 w-16 rounded-full" />
+              )}
             </button>
             <Link
               href="/configuracoes-e-privacidade"

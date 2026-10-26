@@ -10,7 +10,11 @@ import { PlayerAttributesSectionProps } from './type';
 
 const EDIT_HREF = '/perfil/atributos';
 
-export function PlayerAttributesSection({ attributes, language }: PlayerAttributesSectionProps) {
+export function PlayerAttributesSection({
+  attributes,
+  language,
+  isEditable = false,
+}: PlayerAttributesSectionProps) {
   const text = PLAYER_ATTRIBUTES_TEXT[language];
   const themeClasses = useThemeClasses();
   const pills: (AttributePillProps & { key: string })[] = [];
@@ -42,7 +46,7 @@ export function PlayerAttributesSection({ attributes, language }: PlayerAttribut
     <section className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="m-0 text-sm font-black">{text.title}</h3>
-        {pills.length > 0 && (
+        {isEditable && pills.length > 0 && (
           <Link
             href={EDIT_HREF}
             aria-label={text.edit}
@@ -59,13 +63,15 @@ export function PlayerAttributesSection({ attributes, language }: PlayerAttribut
             <AttributePill key={key} {...pill} />
           ))}
         </div>
-      ) : (
+      ) : isEditable ? (
         <Link
           href={EDIT_HREF}
           className={`text-sm italic underline-offset-2 hover:underline ${themeClasses.subText}`}
         >
           {text.empty}
         </Link>
+      ) : (
+        <p className={`text-sm italic ${themeClasses.subText}`}>{text.empty}</p>
       )}
     </section>
   );

@@ -16,8 +16,20 @@ import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
 import { useAccount } from '@/src/core/providers/account';
 import { AttributeSelect } from '../attribute-select';
 import { PlayerAttributesSkeleton } from '../player-attributes-skeleton';
+import { PlayerAttributesFormProps } from './type';
 
-function PlayerAttributesFields({ saved, text }: { saved: PlayerAttributes; text: PlayerAttributesText }) {
+// Depois dos atributos, o cadastro segue para a edição do perfil, como nos outros tipos.
+const PROFILE_EDIT_AFTER_ONBOARDING = '/perfil/editar?origem=tipo-de-conta';
+
+function PlayerAttributesFields({
+  saved,
+  text,
+  isOnboarding,
+}: {
+  saved: PlayerAttributes;
+  text: PlayerAttributesText;
+  isOnboarding: boolean;
+}) {
   const router = useRouter();
   const { updatePlayerAttributes } = useAccount();
   const themeClasses = useThemeClasses();
@@ -35,15 +47,20 @@ function PlayerAttributesFields({ saved, text }: { saved: PlayerAttributes; text
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!hasChanges) return;
+    // No cadastro, "Concluir" sem nada preenchido só segue em frente.
+    if (!hasChanges) {
+      if (isOnboarding) router.replace(PROFILE_EDIT_AFTER_ONBOARDING);
+      return;
+    }
 
     setErrorMessage('');
     setIsSubmitting(true);
 
     try {
       await updatePlayerAttributes({ preferredFoot, position, category });
-      // Volta para o perfil, onde os atributos aparecem. O botão segue em "Salvando..." até lá.
-      router.replace('/perfil');
+      // Fora do cadastro volta para o perfil, onde os atributos aparecem.
+      // O botão segue em "Salvando..." até a próxima tela abrir.
+      router.replace(isOnboarding ? PROFILE_EDIT_AFTER_ONBOARDING : '/perfil');
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.');
       setIsSubmitting(false);
@@ -96,18 +113,30 @@ function PlayerAttributesFields({ saved, text }: { saved: PlayerAttributes; text
 
       <button
         type="submit"
-        disabled={isSubmitting || !hasChanges}
+        disabled={isSubmitting || (!isOnboarding && !hasChanges)}
         className="w-full py-2.5 bg-indigo-600 enabled:hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isSubmitting ? text.saving : text.save}
+        {isSubmitting ? text.saving : isOnboarding ? text.finish : text.save}
       </button>
+
+      {isOnboarding && (
+        <button
+          type="button"
+          onClick={() => router.replace(PROFILE_EDIT_AFTER_ONBOARDING)}
+          disabled={isSubmitting}
+          className={`w-full py-2.5 border rounded-xl font-bold text-xs transition enabled:hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed ${themeClasses.subText}`}
+        >
+          {text.skip}
+        </button>
+      )}
     </form>
   );
 }
 
-export function PlayerAttributesForm() {
+export function PlayerAttributesForm({ isOnboarding }: PlayerAttributesFormProps) {
   const router = useRouter();
   const { account, configuration, isLoading } = useAccount();
+  const themeClasses = useThemeClasses();
   const text = PLAYER_ATTRIBUTES_TEXT[configuration.language];
   const isPlayer = account?.type === AccountType.PLAYER;
 
@@ -118,9 +147,18 @@ export function PlayerAttributesForm() {
 
   return (
     <>
-      <PageHeader title={text.edit} />
+      {/* No cadastro, voltar vai para a home: a tela anterior no histórico é o login ou o cadastro. */}
+      <PageHeader
+        title={isOnboarding ? text.onboardingTitle : text.edit}
+        backHref={isOnboarding ? '/home' : undefined}
+      />
+      {isOnboarding && <p className={`text-xs ${themeClasses.subText}`}>{text.onboardingHint}</p>}
       {isPlayer && account.playerAttributes ? (
-        <PlayerAttributesFields saved={account.playerAttributes} text={text} />
+        <PlayerAttributesFields
+          saved={account.playerAttributes}
+          text={text}
+          isOnboarding={isOnboarding}
+        />
       ) : (
         <PlayerAttributesSkeleton />
       )}

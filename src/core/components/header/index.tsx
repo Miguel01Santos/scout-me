@@ -17,12 +17,13 @@ const NAV_ITEMS: HeaderNavItem[] = [
 
 export function Header() {
   const { user } = useSession();
-  const { account } = useAccount();
+  const { account, isLoading } = useAccount();
   const themeClasses = useThemeClasses();
 
   return (
     <div className="flex items-center gap-5">
-      {user ? (
+      {/* Espera a conta também: a cor do anel depende do tipo, e sem ele piscaria a cor errada. */}
+      {user && !isLoading ? (
         <AvatarComponent
           name={user.name}
           avatarUrl={user.avatarUrl}

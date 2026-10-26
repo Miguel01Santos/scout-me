@@ -1,9 +1,20 @@
 import { z } from 'zod';
 import { Language, Theme } from '../configuration/constants.js';
 import { PlayerCategory, PlayerPosition, PreferredFoot } from '../player/constants.js';
-import { AccountType } from './constants.js';
+import { AccountType, RESERVED_USERNAMES, USERNAME_PATTERN } from './constants.js';
 import { AvatarColor, BIO_MAX_LENGTH } from '../profile/constants.js';
 import { nameSchema } from '../user/schema.js';
+
+export const usernameSchema = z
+  .string('Usuário inválido')
+  .trim()
+  .toLowerCase()
+  .pipe(
+    z
+      .string()
+      .regex(USERNAME_PATTERN, 'Use de 3 a 30 caracteres: letras, números, ponto ou _, começando com letra')
+      .refine((username) => !RESERVED_USERNAMES.includes(username), 'Esse nome de usuário não está disponível')
+  );
 
 export const updateConfigurationSchema = z.object({
   theme: z.enum(Object.values(Theme), 'Tema inválido').optional(),
@@ -29,6 +40,7 @@ export const updateAccountSchema = z.object({
 });
 
 export const updateProfileSchema = z.object({
+  username: usernameSchema.optional(),
   displayName: nameSchema.nullable().optional(),
   showDisplayName: z.boolean('Valor inválido').optional(),
   bio: z

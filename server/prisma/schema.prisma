@@ -43,8 +43,9 @@ model Session {
 model Account {
   id        Int     @id @default(autoincrement())
   userId    String  @map("user_id")
+  username  String  @unique
   type      String?
-  isPrivate Boolean @default(true) @map("is_private")
+  isPrivate Boolean @default(false) @map("is_private")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
@@ -55,6 +56,8 @@ model Account {
   playerAttributes PlayerAttributes?
   ratingsGiven     Rating[]          @relation("RatingRater")
   ratingsReceived  Rating[]          @relation("RatingRated")
+  following        Follow[]          @relation("Following")
+  followers        Follow[]          @relation("Followers")
 
   @@map("account")
 }
@@ -96,6 +99,22 @@ model PlayerAttributes {
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("player_attributes")
+}
+
+model Follow {
+  followerId Int       @map("follower_id")
+  followedId Int       @map("followed_id")
+  status     String
+  createdAt  DateTime  @default(now()) @map("created_at")
+  acceptedAt DateTime? @map("accepted_at")
+
+  follower Account @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followed Account @relation("Followers", fields: [followedId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followedId])
+  @@index([followedId, status])
+  @@index([followerId, status])
+  @@map("follow")
 }
 
 model Rating {

@@ -18,6 +18,8 @@ export interface AccountContextValue {
   updateAccount: (input: UpdateAccountInput) => Promise<void>;
   updateProfile: (input: UpdateProfileInput) => Promise<void>;
   updatePlayerAttributes: (input: UpdatePlayerAttributesInput) => Promise<void>;
+  acceptFollowRequest: (username: string) => Promise<void>;
+  declineFollowRequest: (username: string) => Promise<void>;
   changeAvatar: (image: Blob) => Promise<void>;
   removeAvatar: () => Promise<void>;
 }

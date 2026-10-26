@@ -4,4 +4,5 @@ import { Language } from '@/src/core/enums/language';
 export interface PlayerAttributesSectionProps {
   attributes: PlayerAttributes;
   language: Language;
+  isEditable?: boolean;
 }

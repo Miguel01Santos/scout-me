@@ -15,6 +15,7 @@ export function ProfileSummarySkeleton() {
             <Skeleton className={`h-5 w-32 ${themeClasses.skeleton}`} />
             <Skeleton className={`h-5 w-14 rounded-full ${themeClasses.skeleton}`} />
           </div>
+          <Skeleton className={`h-3 w-24 ${themeClasses.skeleton}`} />
           <Skeleton className={`h-3.5 w-48 ${themeClasses.skeleton}`} />
           <Skeleton className={`h-4 w-24 ${themeClasses.skeleton}`} />
         </div>

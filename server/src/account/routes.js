@@ -1,5 +1,8 @@
 import { Router } from 'express';
 import {
+  acceptRequest,
+  declineRequest,
+  followRequests,
   me,
   update,
   updateMe,
@@ -17,3 +20,6 @@ accountRouter.patch('/me/configuration', authenticate, update);
 accountRouter.patch('/me/profile', authenticate, updateMyProfile);
 accountRouter.put('/me/type', authenticate, updateMyType);
 accountRouter.put('/me/player-attributes', authenticate, updateMyPlayerAttributes);
+accountRouter.get('/me/follow-requests', authenticate, followRequests);
+accountRouter.post('/me/follow-requests/:username', authenticate, acceptRequest);
+accountRouter.delete('/me/follow-requests/:username', authenticate, declineRequest);

@@ -41,5 +41,5 @@ function destinationFor(pathname: string, state: string | undefined, hostname: s
 
 export const config = {
   // Só páginas: ficam de fora o proxy da API (/api), os arquivos do Next e tudo que tem extensão.
-  matcher: ['/((?!api/|_next/|.*\\..*).*)'],
+  matcher: ['/((?!api/|_next/|.*\\..*).*)', '/perfil/:username'],
 };

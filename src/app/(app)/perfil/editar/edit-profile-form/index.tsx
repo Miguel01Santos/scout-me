@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ApiError } from '@/src/core/api';
 import { useSession } from '@/src/core/auth/use-session';
 import { TextAreaField } from '@/src/core/components/textarea-field';
 import { TextField } from '@/src/core/components/text-field';
@@ -11,6 +12,7 @@ import { useAccount } from '@/src/core/providers/account';
 import { BIO_MAX_LENGTH, validateBio } from '@/src/core/utils/validate-bio';
 import { validateDisplayName } from '@/src/core/utils/validate-name';
 import { resolveAvatarUrl } from '@/src/core/utils/resolve-avatar-url';
+import { normalizeUsername, validateUsername } from '@/src/core/utils/validate-username';
 import { AvatarColorPicker } from '../avatar-color-picker';
 import { AvatarEditor } from '../avatar-editor';
 import { DisplayNameSwitch } from '../display-name-switch';
@@ -21,6 +23,9 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
   const { account, updateProfile } = useAccount();
   const themeClasses = useThemeClasses();
   const savedProfile = account?.profile;
+  const savedUsername = account?.username ?? '';
+  const [username, setUsername] = useState(savedUsername);
+  const [usernameIssue, setUsernameIssue] = useState<string>();
   const [displayName, setDisplayName] = useState(savedProfile?.displayName ?? '');
   const [showDisplayName, setShowDisplayName] = useState(savedProfile?.showDisplayName ?? true);
   const [bio, setBio] = useState(savedProfile?.bio ?? '');
@@ -31,7 +36,10 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
   const currentAvatarUrl = resolveAvatarUrl(savedProfile, avatarUrl);
   const nameError = validateDisplayName(displayName);
   const bioError = validateBio(bio);
+  const normalizedUsername = normalizeUsername(username);
+  const usernameError = usernameIssue ?? validateUsername(username);
   const hasChanges =
+    normalizedUsername !== savedUsername ||
     displayName !== (savedProfile?.displayName ?? '') ||
     showDisplayName !== (savedProfile?.showDisplayName ?? true) ||
     bio !== (savedProfile?.bio ?? '') ||
@@ -40,13 +48,14 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (nameError || bioError || !hasChanges) return;
+    if (nameError || bioError || usernameError || !hasChanges) return;
 
     setFeedback(null);
     setIsSubmitting(true);
 
     try {
       await updateProfile({
+        ...(normalizedUsername !== savedUsername && { username: normalizedUsername }),
         displayName: displayName.length > 0 ? displayName : null,
         showDisplayName,
         bio: bio.trim().length > 0 ? bio : null,
@@ -55,10 +64,19 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
       // O botão continua em "Salvando..." até a home abrir.
       router.replace('/home');
     } catch (error) {
-      setFeedback({
-        message: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.',
-        isError: true,
-      });
+      const issue =
+        error instanceof ApiError
+          ? error.issues.find((apiIssue) => apiIssue.field === 'username')
+          : undefined;
+
+      if (issue) {
+        setUsernameIssue(issue.message);
+      } else {
+        setFeedback({
+          message: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.',
+          isError: true,
+        });
+      }
       setIsSubmitting(false);
     }
   }
@@ -85,6 +103,18 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
       )}
 
       <div className="space-y-3">
+        <TextField
+          label="Nome de usuário"
+          inputClassName={themeClasses.input}
+          value={username}
+          onChange={(value) => {
+            setUsername(value);
+            setUsernameIssue(undefined);
+          }}
+          error={usernameError}
+          placeholder="ex.: andre.lima"
+          autoComplete="off"
+        />
         <TextField
           label="Nome do perfil"
           inputClassName={themeClasses.input}
@@ -116,7 +146,9 @@ function EditProfileFields({ userName, avatarUrl }: { userName: string; avatarUr
 
       <button
         type="submit"
-        disabled={isSubmitting || Boolean(nameError) || Boolean(bioError) || !hasChanges}
+        disabled={
+          isSubmitting || Boolean(nameError) || Boolean(bioError) || Boolean(usernameError) || !hasChanges
+        }
         className="w-full py-2.5 bg-indigo-600 enabled:hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isSubmitting ? 'Salvando...' : 'Salvar'}

@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Pencil, X } from 'lucide-react';
-import { Chip } from '@heroui/react';
+import { Chip, Skeleton } from '@heroui/react';
 import { ApiError } from '@/src/core/api';
 import { ApiIssue } from '@/src/core/api/type';
 import { updateUser } from '@/src/core/api/user/service';
@@ -67,9 +67,13 @@ export function ProfileForm({ user }: ProfileFieldsProps) {
     <form onSubmit={handleSubmit} className={`p-4 border rounded-2xl space-y-4 ${themeClasses.card}`}>
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-black m-0">Meus dados</h2>
-        <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
-          {ACCOUNT_TYPE_NAME[accountType]}
-        </Chip>
+        {accountType ? (
+          <Chip className={`${ACCOUNT_TYPE_COLOR[accountType].background} text-white`}>
+            {ACCOUNT_TYPE_NAME[accountType]}
+          </Chip>
+        ) : (
+          <Skeleton className={`h-6 w-16 rounded-full ${themeClasses.skeleton}`} />
+        )}
       </div>
 
       {feedback && (

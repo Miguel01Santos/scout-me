@@ -20,14 +20,16 @@ export const ACCOUNT_TYPE_NAME: Record<AccountType, string> = {
 };
 
 export const ACCOUNT_TYPE_COLOR: Record<AccountType, { ring: string; background: string }> = {
-  [AccountType.PLAYER]: { ring: 'ring-emerald-500', background: 'bg-emerald-500' },
-  [AccountType.TEAM]: { ring: 'ring-blue-500', background: 'bg-blue-500' },
+  [AccountType.PLAYER]: { ring: 'ring-blue-500', background: 'bg-blue-500' },
+  [AccountType.TEAM]: { ring: 'ring-emerald-500', background: 'bg-emerald-500' },
   [AccountType.ORGANIZATION]: { ring: 'ring-black', background: 'bg-black' },
   [AccountType.SCOUT]: { ring: 'ring-fuchsia-500', background: 'bg-fuchsia-500' },
 };
 
-export function toAccountType(type?: string | null): AccountType {
+// Tipo desconhecido (conta ainda carregando) vira null, e não Player: quem mostra a cor
+// do tipo espera ele chegar em vez de piscar a cor errada.
+export function toAccountType(type?: string | null): AccountType | null {
   const accountTypes: string[] = Object.values(AccountType);
 
-  return type && accountTypes.includes(type) ? (type as AccountType) : AccountType.PLAYER;
+  return type && accountTypes.includes(type) ? (type as AccountType) : null;
 }
