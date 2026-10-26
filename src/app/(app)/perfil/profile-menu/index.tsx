@@ -4,18 +4,26 @@ import { Key } from 'react';
 import { useRouter } from 'next/navigation';
 import { Dropdown, Label } from '@heroui/react';
 import { Lock, Menu, Share2, UserPen } from 'lucide-react';
+import { useSession } from '@/src/core/auth/use-session';
 import { useDarkMode } from '@/src/core/hooks/use-dark-mode';
+import { useAccount } from '@/src/core/providers/account';
+import { getDisplayName } from '@/src/core/utils/get-display-name';
+import { shareProfile } from '@/src/core/utils/share-profile';
 
 const ITEM_CLASS_NAME = 'flex items-center gap-3 text-sm';
 
 export function ProfileMenu() {
   const router = useRouter();
   const darkMode = useDarkMode();
+  const { user } = useSession();
+  const { account } = useAccount();
 
   function handleAction(key: Key) {
     if (key === 'edit') router.push('/perfil/editar');
     if (key === 'privacy') router.push('/configuracoes-e-privacidade/privacidade');
-    // "Compartilhar" ainda não tem ação.
+    if (key === 'share' && user && account) {
+      shareProfile({ name: getDisplayName(user.name, account.profile), username: account.username });
+    }
   }
 
   return (

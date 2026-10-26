@@ -50,7 +50,7 @@ O servidor não sobe se `DATABASE_URL` ou `JWT_SECRET` estiverem ausentes.
 | GET    | `/account/me/follow-requests` | sim | Lista os pedidos para seguir pendentes |
 | POST   | `/account/me/follow-requests/:username` | sim | Aceita o pedido de `:username` |
 | DELETE | `/account/me/follow-requests/:username` | sim | Recusa o pedido de `:username` |
-| GET    | `/profiles?search=` | sim | Busca perfis por nome ou @usuário (300 buscas a cada 15 min por usuário) |
+| GET    | `/profiles?search=&filter=` | sim | Busca perfis por nome ou @usuário, com filtro por grupo de conta (300 buscas a cada 15 min por usuário) |
 | GET    | `/profiles/:username` | sim | Perfil público visto por quem está logado |
 | POST   | `/profiles/:username/follow` | sim | Segue o perfil, ou pede para seguir se ele for privado (60 ações a cada 15 min por usuário) |
 | DELETE | `/profiles/:username/follow` | sim | Deixa de seguir ou cancela o pedido |
@@ -217,6 +217,10 @@ termo precisa de 2 a 50 caracteres (`@` no começo é ignorado) e procura no
 `username`, no nome e no nome de exibição (só quando ele está visível). Quem busca
 não aparece no resultado. A ordem é: @ exato, @ que começa com o termo, nome que
 começa com o termo, o resto.
+
+`filter` é opcional e restringe os tipos de conta: `all` (padrão, todos), `users`
+(`player` e `scout`) ou `accounts` (`team` e `organization`). Outro valor responde
+`422`. Os grupos ficam em `src/profile/constants.js`.
 
 `GET /account/me/follow-requests` devolve `{ requests }`, os cartões de quem pediu
 com `requestedAt`, mais recentes primeiro. Aceitar ou recusar devolve `{ account }`

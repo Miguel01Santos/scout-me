@@ -4,10 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { ApiError } from '@/src/core/api';
 import { searchProfiles } from '@/src/core/api/profiles/service';
-import { ProfileCard } from '@/src/core/api/profiles/type';
+import { ProfileCard, ProfileSearchFilter } from '@/src/core/api/profiles/type';
 import { getSession } from '@/src/core/auth';
 import { TextField } from '@/src/core/components/text-field';
+import { DiscoverFilter } from '@/src/core/enums/discover-filter';
 import { useThemeClasses } from '@/src/core/hooks/use-theme-classes';
+import { DISCOVER_FILTERS } from '../constants';
+import { DiscoverFilters } from '../discover-filters';
 import { ProfileResult } from '../profile-result';
 import { ProfileResultsSkeleton } from '../profile-results-skeleton';
 import { ProfileSearchStatus } from './type';
@@ -18,54 +21,72 @@ const SEARCH_MIN_LENGTH = 2;
 export function ProfileSearch() {
   const themeClasses = useThemeClasses();
   const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState(DiscoverFilter.ALL);
   const [results, setResults] = useState<ProfileCard[]>([]);
   const [status, setStatus] = useState<ProfileSearchStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const latestSearchRef = useRef('');
+  const latestRequestRef = useRef(0);
 
   useEffect(() => () => {
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
 
-  async function runSearch(term: string) {
+  async function runSearch(term: string, searchFilter: ProfileSearchFilter, requestId: number) {
     const session = getSession();
 
     if (!session) return;
 
     try {
-      const { profiles } = await searchProfiles(session.accessToken, term);
+      const { profiles } = await searchProfiles(session.accessToken, term, searchFilter);
 
-      if (latestSearchRef.current !== term) return;
+      if (latestRequestRef.current !== requestId) return;
 
       setResults(profiles);
       setStatus('ready');
     } catch (error) {
-      if (latestSearchRef.current !== term) return;
+      if (latestRequestRef.current !== requestId) return;
 
       setErrorMessage(error instanceof ApiError ? error.message : 'Não foi possível buscar agora.');
       setStatus('error');
     }
   }
 
-  function handleChange(value: string) {
+  function startSearch(value: string, nextFilter: DiscoverFilter, delay: number) {
     const term = value.trim();
+    const requestId = latestRequestRef.current + 1;
 
-    setQuery(value);
+    latestRequestRef.current = requestId;
     setErrorMessage('');
-    latestSearchRef.current = term;
 
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    if (term.replace(/^@/, '').length < SEARCH_MIN_LENGTH) {
+    if (
+      nextFilter === DiscoverFilter.LOCATIONS ||
+      term.replace(/^@/, '').length < SEARCH_MIN_LENGTH
+    ) {
       setResults([]);
       setStatus('idle');
       return;
     }
 
     setStatus('loading');
-    timerRef.current = setTimeout(() => runSearch(term), SEARCH_DELAY_MS);
+    timerRef.current = setTimeout(() => runSearch(term, nextFilter, requestId), delay);
   }
+
+  function handleChange(value: string) {
+    setQuery(value);
+    startSearch(value, filter, SEARCH_DELAY_MS);
+  }
+
+  function handleFilterChange(nextFilter: DiscoverFilter) {
+    if (nextFilter === filter) return;
+
+    setFilter(nextFilter);
+    startSearch(query, nextFilter, 0);
+  }
+
+  const hint = DISCOVER_FILTERS.find((option) => option.value === filter)?.hint;
 
   return (
     <section className="space-y-4">
@@ -80,11 +101,9 @@ export function ProfileSearch() {
         action={<Search size={16} className={`mr-2 ${themeClasses.subText}`} />}
       />
 
-      {status === 'idle' && (
-        <p className={`text-sm ${themeClasses.subText}`}>
-          Busque atletas, olheiros e times pelo nome ou pelo @usuário.
-        </p>
-      )}
+      <DiscoverFilters value={filter} onChange={handleFilterChange} />
+
+      {status === 'idle' && <p className={`text-sm ${themeClasses.subText}`}>{hint}</p>}
 
       {status === 'loading' && <ProfileResultsSkeleton />}
 

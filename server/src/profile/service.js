@@ -3,6 +3,7 @@ import { AccountType } from '../account/constants.js';
 import { toProfileCard, toPublicPlayerAttributes } from '../account/mappers.js';
 import { findAccountByUserId, findAccountByUsername } from '../account/service.js';
 import { FollowStatus } from '../follow/constants.js';
+import { SEARCH_FILTER_ACCOUNT_TYPES } from './constants.js';
 import {
   countFollows,
   findFollowStatus,
@@ -53,13 +54,14 @@ async function findViewerAndProfile(viewerUserId, username) {
   return Promise.all([findAccountByUserId(viewerUserId), findAccountByUsername(username)]);
 }
 
-export async function searchProfiles(viewerUserId, search) {
+export async function searchProfiles(viewerUserId, search, filter) {
   const viewer = await findAccountByUserId(viewerUserId);
   const term = search.replace(/^@/, '').toLowerCase();
+  const accountTypes = SEARCH_FILTER_ACCOUNT_TYPES[filter];
   const accounts = await prismaClient.account.findMany({
     where: {
       id: { not: viewer.id },
-      type: { not: null },
+      type: accountTypes ? { in: accountTypes } : { not: null },
       OR: [
         { username: { contains: term } },
         { user: { name: { contains: term, mode: 'insensitive' } } },

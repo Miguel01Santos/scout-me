@@ -20,7 +20,7 @@ export function FollowButton({ status, isBusy, onPress }: FollowButtonProps) {
       onClick={onPress}
       disabled={isBusy}
       aria-pressed={isFollowing}
-      className={`w-full py-2 rounded-xl text-xs font-bold transition disabled:opacity-50 disabled:cursor-not-allowed ${
+      className={`flex-1 py-2 rounded-xl text-xs font-bold transition disabled:opacity-50 disabled:cursor-not-allowed ${
         isFollowing
           ? `border ${themeClasses.subText} enabled:hover:opacity-80`
           : 'bg-indigo-600 text-white enabled:hover:bg-indigo-500'

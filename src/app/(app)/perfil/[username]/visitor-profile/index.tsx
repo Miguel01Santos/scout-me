@@ -19,6 +19,7 @@ import { PlayerAttributesSection } from '../../player-attributes';
 import { PrivateProfileNotice } from '../../private-profile-notice';
 import { ProfileSummarySkeleton } from '../../profile-summary-skeleton';
 import { ProfileView } from '../../profile-view';
+import { ShareProfileButton } from '../../share-profile-button';
 import { VisitorProfileLoadState, VisitorProfileProps } from './type';
 
 export function VisitorProfile({ username }: VisitorProfileProps) {
@@ -119,11 +120,14 @@ export function VisitorProfile({ username }: VisitorProfileProps) {
                   {errorMessage}
                 </p>
               )}
-              <FollowButton
-                status={profile.followStatus ?? FollowStatus.NONE}
-                isBusy={isFollowBusy}
-                onPress={handleFollowPress}
-              />
+              <div className="flex gap-2">
+                <FollowButton
+                  status={profile.followStatus ?? FollowStatus.NONE}
+                  isBusy={isFollowBusy}
+                  onPress={handleFollowPress}
+                />
+                <ShareProfileButton name={displayName} username={profile.username} />
+              </div>
             </div>
           }
         >

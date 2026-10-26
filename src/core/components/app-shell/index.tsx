@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Toast } from '@heroui/react';
 import { useDarkMode } from '../../hooks/use-dark-mode';
 import { useThemeClasses } from '../../hooks/use-theme-classes';
 import { useAccount } from '../../providers/account';
@@ -23,6 +24,7 @@ export function AppShell({ children }: AppShellProps) {
     <div className={`min-h-screen font-sans transition-colors duration-200 ${themeClasses.bg}`}>
       {/* Só o fundo até confirmar a sessão, para nenhuma página aparecer antes de ir para o login. */}
       {isAuthenticated && children}
+      <Toast.Provider />
     </div>
   );
 }

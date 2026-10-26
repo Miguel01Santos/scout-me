@@ -1,4 +1,5 @@
 import { AccountType } from '../../enums/account-type';
+import { DiscoverFilter } from '../../enums/discover-filter';
 import { FollowStatus } from '../../enums/follow-status';
 import { PlayerAttributes } from '../player-attributes/type';
 
@@ -26,3 +27,5 @@ export interface PublicProfile extends ProfileCard {
 export interface FollowRequest extends ProfileCard {
   requestedAt: string;
 }
+
+export type ProfileSearchFilter = Exclude<DiscoverFilter, DiscoverFilter.LOCATIONS>;
