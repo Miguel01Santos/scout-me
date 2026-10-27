@@ -1,7 +1,11 @@
 import { AccountType } from '../../enums/account-type';
+import { ClubAction } from '../../enums/club';
 import { DiscoverFilter } from '../../enums/discover-filter';
 import { FollowStatus } from '../../enums/follow-status';
+import { PlayerCategory, PlayerPosition, PreferredFoot } from '../../enums/player-attributes';
+import { PlayerLevel } from '../../enums/player-level';
 import { PlayerAttributes } from '../player-attributes/type';
+import { RatingActions, RatingSummary } from '../ratings/type';
 
 export interface ProfileCard {
   username: string;
@@ -13,7 +17,7 @@ export interface ProfileCard {
   avatarColor: string | null;
 }
 
-export interface PublicProfile extends ProfileCard {
+export interface PublicProfile extends ProfileCard, RatingSummary {
   isPrivate: boolean;
   bio: string | null;
   playerAttributes: PlayerAttributes | null;
@@ -22,6 +26,10 @@ export interface PublicProfile extends ProfileCard {
   isOwner: boolean;
   followStatus: FollowStatus | null;
   canViewDetails: boolean;
+  ratingActions: RatingActions | null;
+  club: ProfileCard | null;
+  clubAction: ClubAction | null;
+  athletesCount: number | null;
 }
 
 export interface FollowRequest extends ProfileCard {
@@ -29,3 +37,15 @@ export interface FollowRequest extends ProfileCard {
 }
 
 export type ProfileSearchFilter = Exclude<DiscoverFilter, DiscoverFilter.LOCATIONS>;
+
+export interface PlayerSearchFilters {
+  position: PlayerPosition | null;
+  preferredFoot: PreferredFoot | null;
+  category: PlayerCategory | null;
+  level: PlayerLevel | null;
+}
+
+export interface SearchProfilesInput extends PlayerSearchFilters {
+  search: string;
+  filter: ProfileSearchFilter;
+}

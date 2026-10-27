@@ -1,6 +1,8 @@
 import { prismaClient } from '../prisma.js';
 import { HttpError } from '../http-error.js';
 import { toProfileCard } from '../account/mappers.js';
+import { NotificationTitle } from '../notification/constants.js';
+import { createNotification } from '../notification/service.js';
 import { FollowStatus } from './constants.js';
 
 export const PROFILE_CARD_INCLUDE = {
@@ -28,24 +30,41 @@ export async function findFollowStatus(followerId, followedId) {
   return follow?.status ?? null;
 }
 
-export async function followAccount(follower, followed) {
+export async function followAccount(follower, followed, database = prismaClient) {
   if (follower.id === followed.id) {
     throw new HttpError(400, 'Você não pode seguir o próprio perfil');
   }
 
   const status = followed.isPrivate ? FollowStatus.PENDING : FollowStatus.ACCEPTED;
-  const follow = await prismaClient.follow.upsert({
-    where: followKey(follower.id, followed.id),
-    update: {},
-    create: {
+  const { count } = await database.follow.createMany({
+    data: {
       followerId: follower.id,
       followedId: followed.id,
       status,
       acceptedAt: status === FollowStatus.ACCEPTED ? new Date() : null,
     },
+    skipDuplicates: true,
   });
 
-  return follow.status;
+  return count > 0 ? status : null;
+}
+
+export async function followAndNotify(follower, followed, database = prismaClient) {
+  const newStatus = await followAccount(follower, followed, database);
+
+  if (!newStatus) return;
+
+  await createNotification(
+    {
+      userGeneratorNotification: follower.id,
+      userReceivesNotification: followed.id,
+      title:
+        newStatus === FollowStatus.PENDING
+          ? NotificationTitle.REQUEST_FOLLOW
+          : NotificationTitle.FOLLOWED_YOU_BACK,
+    },
+    database
+  );
 }
 
 export async function unfollowAccount(followerId, followedId) {
@@ -65,8 +84,8 @@ export async function listFollowRequests(accountId) {
   }));
 }
 
-export async function acceptFollowRequest(accountId, followerId) {
-  const { count } = await prismaClient.follow.updateMany({
+export async function acceptFollowRequest(accountId, followerId, database = prismaClient) {
+  const { count } = await database.follow.updateMany({
     where: { followerId, followedId: accountId, status: FollowStatus.PENDING },
     data: { status: FollowStatus.ACCEPTED, acceptedAt: new Date() },
   });
@@ -87,4 +106,24 @@ export async function acceptAllFollowRequests(accountId, database = prismaClient
     where: { followedId: accountId, status: FollowStatus.PENDING },
     data: { status: FollowStatus.ACCEPTED, acceptedAt: new Date() },
   });
+}
+
+export async function listFollowers(accountId) {
+  const follows = await prismaClient.follow.findMany({
+    where: { followedId: accountId, status: FollowStatus.ACCEPTED },
+    orderBy: { acceptedAt: 'desc' },
+    include: { follower: { include: PROFILE_CARD_INCLUDE } },
+  });
+
+  return follows.map(({ follower }) => toProfileCard(follower));
+}
+
+export async function listFollowing(accountId) {
+  const follows = await prismaClient.follow.findMany({
+    where: { followerId: accountId, status: FollowStatus.ACCEPTED },
+    orderBy: { acceptedAt: 'desc' },
+    include: { followed: { include: PROFILE_CARD_INCLUDE } },
+  });
+
+  return follows.map(({ followed }) => toProfileCard(followed));
 }

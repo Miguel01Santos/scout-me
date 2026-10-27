@@ -2,8 +2,8 @@ import { searchProfilesSchema } from './schema.js';
 import { followProfile, getPublicProfile, searchProfiles, unfollowProfile } from './service.js';
 
 export async function search(request, response) {
-  const { search: term, filter } = searchProfilesSchema.parse(request.query);
-  const profiles = await searchProfiles(request.userId, term, filter);
+  const query = searchProfilesSchema.parse(request.query);
+  const profiles = await searchProfiles(request.userId, query);
 
   return response.status(200).json({ profiles });
 }

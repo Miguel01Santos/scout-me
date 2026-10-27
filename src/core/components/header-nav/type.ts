@@ -8,4 +8,5 @@ export interface HeaderNavItem {
 
 export interface HeaderNavProps {
   items: HeaderNavItem[];
+  badges?: Partial<Record<string, number>>;
 }

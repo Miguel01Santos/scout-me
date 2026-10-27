@@ -8,6 +8,7 @@ import { ApiIssue } from '@/src/core/api/type';
 import { getAccount } from '@/src/core/api/account/service';
 import { landingPathFor, loginUser, saveSession, syncSessionState } from '@/src/core/auth';
 import { useRedirectLoggedUser } from '@/src/core/auth/use-redirect-logged-user';
+import { SavedAccounts } from './saved-accounts';
 import { TextField } from '@/src/core/components/text-field';
 import { AuthFormSkeleton } from '../auth-form-skeleton';
 import { RememberMe } from '../remember-me';
@@ -54,63 +55,66 @@ export default function LoginPage() {
   if (isChecking) return <AuthFormSkeleton fieldCount={2} />;
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-4 border rounded-2xl space-y-4 bg-slate-900/90 border-slate-800"
-    >
-      <div>
-        <h1 className="text-base font-black m-0 text-slate-100">Entrar</h1>
-        <p className="text-[11px] text-slate-400 mt-0.5">
-          Acesse sua conta
-        </p>
-      </div>
-
-      {errorMessage && (
-        <p className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-[11px] font-semibold text-rose-400">
-          {errorMessage}
-        </p>
-      )}
-
-      <div className="space-y-3">
-        <TextField
-          label="E-mail"
-          type="email"
-          value={email}
-          onChange={setEmail}
-          error={issueFor('email')}
-          placeholder="augustolima@gmail.com"
-          autoComplete="email"
-          isRequired
-        />
-
-        <TextField
-          label="Senha"
-          type="password"
-          value={password}
-          onChange={setPassword}
-          error={issueFor('password')}
-          placeholder="••••••••"
-          autoComplete="current-password"
-          isRequired
-        />
-
-        <RememberMe isSelected={remember} onChange={setRemember} />
-      </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition disabled:opacity-50"
+    <>
+      <SavedAccounts />
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 border rounded-2xl space-y-4 bg-slate-900/90 border-slate-800"
       >
-        {isSubmitting ? 'Entrando...' : 'Entrar'}
-      </button>
+        <div>
+          <h1 className="text-base font-black m-0 text-slate-100">Entrar</h1>
+          <p className="text-[11px] text-slate-400 mt-0.5">
+            Acesse sua conta
+          </p>
+        </div>
 
-      <p className="text-[11px] text-slate-400 text-center">
-        Ainda não tem conta?{' '}
-        <Link href="/registro" className="font-bold text-indigo-400 hover:text-indigo-300">
-          Criar conta
-        </Link>
-      </p>
-    </form>
+        {errorMessage && (
+          <p className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-[11px] font-semibold text-rose-400">
+            {errorMessage}
+          </p>
+        )}
+
+        <div className="space-y-3">
+          <TextField
+            label="E-mail"
+            type="email"
+            value={email}
+            onChange={setEmail}
+            error={issueFor('email')}
+            placeholder="augustolima@gmail.com"
+            autoComplete="email"
+            isRequired
+          />
+
+          <TextField
+            label="Senha"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            error={issueFor('password')}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            isRequired
+          />
+
+          <RememberMe isSelected={remember} onChange={setRemember} />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition disabled:opacity-50"
+        >
+          {isSubmitting ? 'Entrando...' : 'Entrar'}
+        </button>
+
+        <p className="text-[11px] text-slate-400 text-center">
+          Ainda não tem conta?{' '}
+          <Link href="/registro" className="font-bold text-indigo-400 hover:text-indigo-300">
+            Criar conta
+          </Link>
+        </p>
+      </form>
+    </>
   );
 }

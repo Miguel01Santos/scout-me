@@ -14,6 +14,8 @@ import {
   acceptFollowRequest as saveFollowRequestAcceptance,
   declineFollowRequest as saveFollowRequestDecline,
   getAccount,
+  hidePendingRating as saveRatingRemoval,
+  publishPendingRating as saveRatingPublication,
   updateAccount as saveAccount,
   updatePlayerAttributes as savePlayerAttributes,
   updateProfile as saveProfile,
@@ -153,6 +155,30 @@ export function AccountProvider({ children }: AccountProviderProps) {
     setAccount(response.account);
   }, []);
 
+  const publishPendingRating = useCallback(async (username: string) => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    const response = await saveRatingPublication(session.accessToken, username);
+
+    setAccount(response.account);
+  }, []);
+
+  const hidePendingRating = useCallback(async (username: string) => {
+    const session = getSession();
+
+    if (!session) throw new Error('Sessão não encontrada. Entre novamente.');
+
+    const response = await saveRatingRemoval(session.accessToken, username);
+
+    setAccount(response.account);
+  }, []);
+
+  const setUnreadNotificationsCount = useCallback((count: number) => {
+    setAccount((current) => (current ? { ...current, unreadNotificationsCount: count } : current));
+  }, []);
+
   const refreshAccount = useCallback(async () => {
     const session = getSession();
 
@@ -197,6 +223,10 @@ export function AccountProvider({ children }: AccountProviderProps) {
       updatePlayerAttributes,
       acceptFollowRequest,
       declineFollowRequest,
+      publishPendingRating,
+      hidePendingRating,
+      setUnreadNotificationsCount,
+      refreshAccount,
       changeAvatar,
       removeAvatar,
     }),
@@ -211,6 +241,10 @@ export function AccountProvider({ children }: AccountProviderProps) {
       updatePlayerAttributes,
       acceptFollowRequest,
       declineFollowRequest,
+      publishPendingRating,
+      hidePendingRating,
+      setUnreadNotificationsCount,
+      refreshAccount,
       changeAvatar,
       removeAvatar,
     ]

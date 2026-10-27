@@ -41,23 +41,35 @@ model Session {
 }
 
 model Account {
-  id        Int     @id @default(autoincrement())
-  userId    String  @map("user_id")
-  username  String  @unique
-  type      String?
-  isPrivate Boolean @default(false) @map("is_private")
+  id            Int     @id @default(autoincrement())
+  userId        String  @map("user_id")
+  username      String  @unique
+  type          String?
+  isPrivate     Boolean @default(false) @map("is_private")
+  ratingScore   Float   @default(0) @map("rating_score")
+  reviewRatings Boolean @default(false) @map("review_ratings")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
 
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  configuration    Configuration?
-  profile          Profile?
-  playerAttributes PlayerAttributes?
-  ratingsGiven     Rating[]          @relation("RatingRater")
-  ratingsReceived  Rating[]          @relation("RatingRated")
-  following        Follow[]          @relation("Following")
-  followers        Follow[]          @relation("Followers")
+  user                   User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  configuration          Configuration?
+  profile                Profile?
+  playerAttributes       PlayerAttributes?
+  ratingsGiven           Rating[]          @relation("RatingRater")
+  ratingsReceived        Rating[]          @relation("RatingRated")
+  following              Follow[]          @relation("Following")
+  followers              Follow[]          @relation("Followers")
+  notificationsGenerated Notification[]    @relation("NotificationGenerator")
+  notificationsReceived  Notification[]    @relation("NotificationReceiver")
+  recentSearches         RecentSearch[]    @relation("RecentSearches")
+  searchedBy             RecentSearch[]    @relation("SearchedBy")
+  ratingRequestsSent     RatingRequest[]   @relation("RatingRequestsSent")
+  ratingRequestsReceived RatingRequest[]   @relation("RatingRequestsReceived")
+  posts                  Post[]
+  postMentions           PostMention[]
+  clubMembers            ClubMember[]      @relation("ClubMembers")
+  clubMemberships        ClubMember[]      @relation("ClubMemberships")
 
   @@map("account")
 }
@@ -117,11 +129,128 @@ model Follow {
   @@map("follow")
 }
 
+model NotificationTemplate {
+  id      Int     @id @default(autoincrement())
+  title   String  @unique
+  type    String
+  message String
+  link    String?
+
+  notifications Notification[]
+
+  @@map("notification_template")
+}
+
+model Notification {
+  id                        Int       @id @default(autoincrement())
+  userGeneratorNotification Int?      @map("user_generator_notification")
+  userReceivesNotification  Int       @map("user_receives_notification")
+  templateId                Int       @map("template_id")
+  createdAt                 DateTime  @default(now()) @map("created_at")
+  readAt                    DateTime? @map("read_at")
+
+  generator Account?             @relation("NotificationGenerator", fields: [userGeneratorNotification], references: [id], onDelete: Cascade)
+  receiver  Account              @relation("NotificationReceiver", fields: [userReceivesNotification], references: [id], onDelete: Cascade)
+  template  NotificationTemplate @relation(fields: [templateId], references: [id])
+
+  @@index([userReceivesNotification, createdAt])
+  @@map("notification")
+}
+
+model RatingRequest {
+  requesterId Int      @map("requester_id")
+  scoutId     Int      @map("scout_id")
+  isPrivate   Boolean  @map("is_private")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  requester Account @relation("RatingRequestsSent", fields: [requesterId], references: [id], onDelete: Cascade)
+  scout     Account @relation("RatingRequestsReceived", fields: [scoutId], references: [id], onDelete: Cascade)
+
+  @@id([requesterId, scoutId, isPrivate])
+  @@index([scoutId])
+  @@map("rating_request")
+}
+
+model Post {
+  id          Int     @id @default(autoincrement())
+  accountId   Int     @map("account_id")
+  position    Int     @db.SmallInt
+  description String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+
+  account  Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  photos   PostPhoto[]
+  mentions PostMention[]
+
+  @@unique([accountId, position])
+  @@map("post")
+}
+
+model PostPhoto {
+  id       Int    @id @default(autoincrement())
+  postId   Int    @map("post_id")
+  url      String
+  position Int    @db.SmallInt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, position])
+  @@map("post_photo")
+}
+
+model PostMention {
+  postId    Int @map("post_id")
+  accountId Int @map("account_id")
+
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([postId, accountId])
+  @@index([accountId])
+  @@map("post_mention")
+}
+
+model ClubMember {
+  clubId    Int       @map("club_id")
+  memberId  Int       @map("member_id")
+  status    String
+  createdAt DateTime  @default(now()) @map("created_at")
+  joinedAt  DateTime? @map("joined_at")
+
+  club   Account @relation("ClubMembers", fields: [clubId], references: [id], onDelete: Cascade)
+  member Account @relation("ClubMemberships", fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@id([clubId, memberId])
+  @@index([memberId, status])
+  @@map("club_member")
+}
+
+model RecentSearch {
+  accountId         Int      @map("account_id")
+  searchedAccountId Int      @map("searched_account_id")
+  searchedAt        DateTime @default(now()) @map("searched_at")
+
+  account         Account @relation("RecentSearches", fields: [accountId], references: [id], onDelete: Cascade)
+  searchedAccount Account @relation("SearchedBy", fields: [searchedAccountId], references: [id], onDelete: Cascade)
+
+  @@id([accountId, searchedAccountId])
+  @@index([accountId, searchedAt])
+  @@map("recent_search")
+}
+
 model Rating {
-  id      Int @id @default(autoincrement())
-  raterId Int @map("rater_id")
-  ratedId Int @map("rated_id")
-  stars   Int @db.SmallInt
+  id         Int     @id @default(autoincrement())
+  raterId    Int     @map("rater_id")
+  ratedId    Int     @map("rated_id")
+  isPrivate  Boolean @default(false) @map("is_private")
+  status     String  @default("published")
+  technique  Int     @db.SmallInt
+  tactics    Int     @db.SmallInt
+  physical   Int     @db.SmallInt
+  creativity Int     @db.SmallInt
+  evolution  Int     @db.SmallInt
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
@@ -129,7 +258,8 @@ model Rating {
   rater Account @relation("RatingRater", fields: [raterId], references: [id], onDelete: Cascade)
   rated Account @relation("RatingRated", fields: [ratedId], references: [id], onDelete: Cascade)
 
-  @@unique([raterId, ratedId])
+  @@unique([raterId, ratedId, isPrivate])
   @@index([ratedId])
+  @@index([ratedId, status])
   @@map("rating")
 }

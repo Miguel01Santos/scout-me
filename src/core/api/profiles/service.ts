@@ -1,5 +1,5 @@
 import { del, get, postAuthenticated } from '../index';
-import { ProfileCard, ProfileSearchFilter, PublicProfile } from './type';
+import { ProfileCard, PublicProfile, SearchProfilesInput } from './type';
 
 function profilePath(username: string) {
   return `/profiles/${encodeURIComponent(username)}`;
@@ -17,9 +17,18 @@ export function unfollowProfile(accessToken: string, username: string) {
   return del<{ profile: PublicProfile }>(`${profilePath(username)}/follow`, accessToken);
 }
 
-export function searchProfiles(accessToken: string, search: string, filter: ProfileSearchFilter) {
-  return get<{ profiles: ProfileCard[] }>(
-    `/profiles?search=${encodeURIComponent(search)}&filter=${filter}`,
-    accessToken
+export function searchProfiles(accessToken: string, input: SearchProfilesInput) {
+  const params = new URLSearchParams(
+    Object.entries(input).filter((entry): entry is [string, string] => Boolean(entry[1]))
   );
+
+  return get<{ profiles: ProfileCard[] }>(`/profiles?${params}`, accessToken);
+}
+
+export function getProfileFollowers(accessToken: string, username: string) {
+  return get<{ profiles: ProfileCard[] }>(`${profilePath(username)}/followers`, accessToken);
+}
+
+export function getProfileFollowing(accessToken: string, username: string) {
+  return get<{ profiles: ProfileCard[] }>(`${profilePath(username)}/following`, accessToken);
 }

@@ -1,7 +1,7 @@
 import bcryptjs from 'bcryptjs';
 import { prismaClient } from '../prisma.js';
 import { HttpError } from '../http-error.js';
-import { destroyAvatar, toOwnedAvatarPublicId } from '../cloudinary/service.js';
+import { destroyImage, toOwnedAvatarPublicId } from '../cloudinary/service.js';
 import { revokeOtherSessions } from '../session/service.js';
 
 export function toPublicUser(user) {
@@ -63,7 +63,7 @@ async function discardPreviousAvatar(previousUrl, nextUrl) {
   const previousPublicId = toOwnedAvatarPublicId(previousUrl);
 
   if (previousPublicId && previousUrl !== nextUrl) {
-    await destroyAvatar(previousPublicId);
+    await destroyImage(previousPublicId);
   }
 }
 

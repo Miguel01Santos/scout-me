@@ -14,8 +14,8 @@ export function PrivateProfileNotice({ isRequestPending }: PrivateProfileNoticeP
         <p className="text-sm font-bold">Esta conta é privada</p>
         <p className={`text-xs ${themeClasses.subText}`}>
           {isRequestPending
-            ? 'Pedido enviado. Quando for aprovado, você vê a descrição e os atributos.'
-            : 'Siga para ver a descrição e os atributos.'}
+            ? 'Pedido enviado. Quando for aprovado, você vê a descrição, os atributos e os posts.'
+            : 'Siga para ver a descrição, os atributos e os posts.'}
         </p>
       </div>
     </div>

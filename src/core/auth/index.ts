@@ -1,10 +1,29 @@
 import { get, post } from '../api';
 import { Account } from '../api/account/type';
 import { SessionState } from '../enums/session-state';
-import { clearSession, getSession, saveSession, saveSessionState } from '../utils/session-store';
-import { AuthSession, AuthUser, LoginInput, RegisterInput } from './type';
+import {
+  clearSession,
+  getSession,
+  keepActiveSession,
+  listSavedSessions,
+  removeSavedSession,
+  restoreSavedSession,
+  SAVED_SESSIONS_LIMIT,
+  saveSession,
+  saveSessionState,
+} from '../utils/session-store';
+import { AuthSession, AuthUser, LoginInput, RegisterInput, SavedSessionProfile } from './type';
 
-export { clearSession, getSession, saveSession, saveSessionState };
+export {
+  clearSession,
+  getSession,
+  keepActiveSession as addAnotherAccount,
+  listSavedSessions,
+  restoreSavedSession,
+  SAVED_SESSIONS_LIMIT,
+  saveSession,
+  saveSessionState,
+};
 
 // Primeira tela depois de entrar: a escolha do tipo, se o cadastro ainda não terminou.
 export function landingPathFor(account: Account) {
@@ -61,4 +80,16 @@ export function ensureSession(): Promise<AuthSession | null> {
     });
 
   return devSessionRequest;
+}
+
+export function switchToSavedAccount(currentProfile: SavedSessionProfile | null, userId: string) {
+  if (currentProfile) keepActiveSession(currentProfile);
+
+  return restoreSavedSession(userId) !== null;
+}
+
+export function forgetSavedAccount(userId: string) {
+  const refreshToken = removeSavedSession(userId)?.session.refreshToken;
+
+  if (refreshToken) post('/auth/logout', { refreshToken }).catch(() => undefined);
 }

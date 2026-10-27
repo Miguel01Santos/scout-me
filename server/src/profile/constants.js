@@ -23,3 +23,5 @@ export const SEARCH_FILTER_ACCOUNT_TYPES = {
   [ProfileSearchFilter.USERS]: [AccountType.PLAYER, AccountType.SCOUT],
   [ProfileSearchFilter.ACCOUNTS]: [AccountType.TEAM, AccountType.ORGANIZATION],
 };
+
+export const SEARCH_MIN_LENGTH = 2;

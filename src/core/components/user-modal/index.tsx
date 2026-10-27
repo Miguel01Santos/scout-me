@@ -1,15 +1,19 @@
 import { MouseEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Settings, ShieldCheck } from "lucide-react";
+import { Activity, Settings, ShieldCheck } from "lucide-react";
 import { Badge, Chip, Skeleton } from "@heroui/react";
 import { DRAWER_EXIT_DURATION_MS, ModalComponent } from "../../library/modal";
+import { AccountSwitcher } from "../account-switcher";
 import { UserAvatar } from "../user-avatar";
 import { getSession } from "../../auth";
 import { getUser } from "../../api/user/service";
 import { User } from "../../api/user/type";
 import { ACCOUNT_TYPE_COLOR, ACCOUNT_TYPE_NAME, toAccountType } from "../../enums/account-type";
+import { toAvatarColor } from "../../enums/avatar-color";
 import { useThemeClasses } from "../../hooks/use-theme-classes";
+import { getDisplayName } from "../../utils/get-display-name";
+import { resolveAvatarUrl } from "../../utils/resolve-avatar-url";
 import { useAccount } from "../../providers/account";
 import { ShieldIcon } from "../../icons";
 import { UserModalProps } from "./type";
@@ -23,6 +27,16 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
   const [user, setUser] = useState<User | null>(null);
   const { account } = useAccount();
   const accountType = toAccountType(account?.type);
+  const currentProfile =
+    user && account
+      ? {
+          name: getDisplayName(user.name, account.profile),
+          username: account.username,
+          avatarUrl: resolveAvatarUrl(account.profile, user.avatarUrl),
+          avatarColor: toAvatarColor(account.profile?.avatarColor),
+          accountType,
+        }
+      : null;
 
   function navigateAfterClose(event: MouseEvent<HTMLAnchorElement>, href: string) {
     event.preventDefault();
@@ -86,6 +100,16 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
               )}
             </button>
             <Link
+              href="/atividades"
+              className={OPTION_CLASS_NAME}
+              onClick={(event) => navigateAfterClose(event, "/atividades")}
+            >
+              <span className="flex items-center gap-3">
+                <Activity size={18} />
+                Atividades
+              </span>
+            </Link>
+            <Link
               href="/configuracoes-e-privacidade"
               className={OPTION_CLASS_NAME}
               onClick={(event) => navigateAfterClose(event, "/configuracoes-e-privacidade")}
@@ -95,6 +119,7 @@ export function UserModal({ isOpen, onOpenChange }: UserModalProps) {
                 Configurações e privacidade
               </span>
             </Link>
+            <AccountSwitcher currentProfile={currentProfile} onLeave={() => onOpenChange(false)} />
           </nav>
         }
         footer={

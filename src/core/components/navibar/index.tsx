@@ -1,29 +1,27 @@
-import { ChartColumn, Users } from "lucide-react";
-import { NaviBarProps } from "./type";
+import { ChartColumn, Newspaper, Users } from 'lucide-react';
+import { HomeScreen, NaviBarProps } from './type';
+
+const SCREENS: { value: HomeScreen; label: string; icon: typeof Users }[] = [
+  { value: 'ranking', label: 'Atletas', icon: Users },
+  { value: 'comparar', label: 'Comparador', icon: ChartColumn },
+  { value: 'feed', label: 'Feed', icon: Newspaper },
+];
 
 export function NaviBar({ screen, setCurrentScreen }: NaviBarProps) {
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <button
-        onClick={() => setCurrentScreen('ranking')}
-        className={`p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 ${
-          screen === 'ranking'
-            ? 'bg-indigo-600 text-white shadow-md'
-            : 'border'
-        }`}
-      >
-        <Users size={14} /> <span>Atletas</span>
-      </button>
-      <button
-        onClick={() => setCurrentScreen('comparar')}
-        className={`p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 ${
-          screen === 'comparar'
-            ? 'bg-indigo-600 text-white shadow-md'
-            : 'border'
-        }`}
-      >
-        <ChartColumn size={14} /> <span>Comparador</span>
-      </button>
+    <div className="grid grid-cols-3 gap-2">
+      {SCREENS.map(({ value, label, icon: Icon }) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => setCurrentScreen(value)}
+          className={`flex items-center justify-center gap-1.5 rounded-xl p-2.5 text-xs font-bold transition ${
+            screen === value ? 'bg-indigo-600 text-white shadow-md' : 'border'
+          }`}
+        >
+          <Icon size={14} /> <span>{label}</span>
+        </button>
+      ))}
     </div>
-  )
+  );
 }

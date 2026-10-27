@@ -129,8 +129,18 @@ export function patch<TResponse>(path: string, accessToken: string, body: unknow
   );
 }
 
-export function postAuthenticated<TResponse>(path: string, accessToken: string) {
-  return request<TResponse>(path, { method: 'POST' }, accessToken);
+export function postAuthenticated<TResponse>(path: string, accessToken: string, body?: unknown) {
+  if (body === undefined) return request<TResponse>(path, { method: 'POST' }, accessToken);
+
+  return request<TResponse>(
+    path,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+    accessToken
+  );
 }
 
 export function put<TResponse>(path: string, accessToken: string, body: unknown) {

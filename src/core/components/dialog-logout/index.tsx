@@ -1,16 +1,28 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import { DialogComponent } from "../../library/dialog";
-import { logoutUser } from "../../auth";
+import { listSavedSessions, logoutUser, switchToSavedAccount } from "../../auth";
 import { useThemeClasses } from "../../hooks/use-theme-classes";
+import { useAccount } from "../../providers/account";
 import { DialogLogoutProps } from "./type";
 
 export function DialogLogout({ isOpen, onOpenChange }: DialogLogoutProps) {
   const router = useRouter();
   const themeClasses = useThemeClasses();
+  const { refreshAccount } = useAccount();
 
-  function logout() {
+  async function logout() {
     logoutUser();
+
+    const [nextAccount] = listSavedSessions();
+
+    if (nextAccount && switchToSavedAccount(null, nextAccount.session.user.id)) {
+      onOpenChange(false);
+      await refreshAccount().catch(() => undefined);
+      router.replace("/home");
+      return;
+    }
+
     router.replace("/login");
   }
 

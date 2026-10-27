@@ -20,6 +20,10 @@ export interface AccountContextValue {
   updatePlayerAttributes: (input: UpdatePlayerAttributesInput) => Promise<void>;
   acceptFollowRequest: (username: string) => Promise<void>;
   declineFollowRequest: (username: string) => Promise<void>;
+  publishPendingRating: (username: string) => Promise<void>;
+  hidePendingRating: (username: string) => Promise<void>;
+  setUnreadNotificationsCount: (count: number) => void;
+  refreshAccount: () => Promise<void>;
   changeAvatar: (image: Blob) => Promise<void>;
   removeAvatar: () => Promise<void>;
 }

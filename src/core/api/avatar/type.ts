@@ -1,10 +1,3 @@
-export interface AvatarUploadSignature {
-  uploadUrl: string;
-  apiKey: string;
-  signature: string;
-  fields: Record<string, string | number>;
-}
+import { UploadSignature } from '../cloudinary/type';
 
-export interface CloudinaryUploadResponse {
-  secure_url: string;
-}
+export type AvatarUploadSignature = UploadSignature;

@@ -1,4 +1,6 @@
 import { Account } from '../api/account/type';
+import { AccountType } from '../enums/account-type';
+import { AvatarColor } from '../enums/avatar-color';
 
 export interface AuthUser {
   id: string;
@@ -36,4 +38,17 @@ export interface LoginInput {
 
 export interface SaveSessionOptions {
   remember?: boolean;
+}
+
+export interface SavedSessionProfile {
+  name: string;
+  username: string | null;
+  avatarUrl: string | null;
+  avatarColor?: AvatarColor | null;
+  accountType: AccountType | null;
+}
+
+export interface SavedSession {
+  session: AuthSession;
+  profile: SavedSessionProfile;
 }

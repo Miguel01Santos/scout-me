@@ -1,0 +1,1 @@
+export const RECENT_SEARCHES_LIMIT = 10;

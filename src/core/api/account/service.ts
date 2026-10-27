@@ -1,6 +1,7 @@
 import { AccountType } from '../../enums/account-type';
 import { del, get, patch, postAuthenticated, put } from '../index';
-import { FollowRequest } from '../profiles/type';
+import { FollowRequest, ProfileCard } from '../profiles/type';
+import { PendingRating } from '../ratings/type';
 import { UpdateConfigurationInput } from '../configuration/type';
 import { UpdatePlayerAttributesInput } from '../player-attributes/type';
 import { UpdateProfileInput } from '../profile/type';
@@ -46,4 +47,30 @@ export function updatePlayerAttributes(accessToken: string, input: UpdatePlayerA
 
 export function updateProfile(accessToken: string, input: UpdateProfileInput) {
   return patch<{ account: Account }>('/account/me/profile', accessToken, input);
+}
+
+export function getPendingRatings(accessToken: string) {
+  return get<{ ratings: PendingRating[] }>('/account/me/pending-ratings', accessToken);
+}
+
+export function publishPendingRating(accessToken: string, username: string) {
+  return postAuthenticated<{ account: Account }>(
+    `/account/me/pending-ratings/${encodeURIComponent(username)}`,
+    accessToken
+  );
+}
+
+export function hidePendingRating(accessToken: string, username: string) {
+  return del<{ account: Account }>(
+    `/account/me/pending-ratings/${encodeURIComponent(username)}`,
+    accessToken
+  );
+}
+
+export function getFollowers(accessToken: string) {
+  return get<{ profiles: ProfileCard[] }>('/account/me/followers', accessToken);
+}
+
+export function getFollowing(accessToken: string) {
+  return get<{ profiles: ProfileCard[] }>('/account/me/following', accessToken);
 }

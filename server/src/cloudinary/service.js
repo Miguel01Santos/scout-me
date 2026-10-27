@@ -3,6 +3,8 @@ import { env } from '../env.js';
 import { HttpError } from '../http-error.js';
 
 const AVATAR_FOLDER = 'scoutme/avatars';
+const POSTS_FOLDER = 'scoutme/posts';
+const PUBLIC_ID_PATTERN = '[0-9a-f-]{36}';
 const ALLOWED_FORMATS = 'jpg,png,webp';
 
 function requireConfig() {
@@ -22,11 +24,11 @@ export function signParams(params, apiSecret) {
   return createHash('sha1').update(`${stringToSign}${apiSecret}`).digest('hex');
 }
 
-export function createAvatarUploadSignature() {
+function createUploadSignature(folder) {
   const config = requireConfig();
   const fields = {
     allowed_formats: ALLOWED_FORMATS,
-    public_id: `${AVATAR_FOLDER}/${randomUUID()}`,
+    public_id: `${folder}/${randomUUID()}`,
     timestamp: Math.floor(Date.now() / 1000),
   };
 
@@ -38,22 +40,42 @@ export function createAvatarUploadSignature() {
   };
 }
 
-export function extractAvatarPublicId(url, cloudName) {
+function extractPublicId(url, cloudName, folder) {
   if (!url || !cloudName) return null;
 
   const escapedCloudName = cloudName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const pattern = new RegExp(
-    `^https://res\\.cloudinary\\.com/${escapedCloudName}/image/upload/(?:v\\d+/)?(${AVATAR_FOLDER}/[0-9a-f-]{36})\\.(?:jpg|png|webp)$`
+    `^https://res\\.cloudinary\\.com/${escapedCloudName}/image/upload/(?:v\\d+/)?(${folder}/${PUBLIC_ID_PATTERN})\\.(?:jpg|png|webp)$`
   );
 
   return url.match(pattern)?.[1] ?? null;
+}
+
+function postFolder(accountId) {
+  return `${POSTS_FOLDER}/${accountId}`;
+}
+
+export function createAvatarUploadSignature() {
+  return createUploadSignature(AVATAR_FOLDER);
+}
+
+export function extractAvatarPublicId(url, cloudName) {
+  return extractPublicId(url, cloudName, AVATAR_FOLDER);
 }
 
 export function toOwnedAvatarPublicId(url) {
   return extractAvatarPublicId(url, env.cloudinary?.cloudName);
 }
 
-export async function destroyAvatar(publicId) {
+export function createPostUploadSignatures(accountId, count) {
+  return Array.from({ length: count }, () => createUploadSignature(postFolder(accountId)));
+}
+
+export function toOwnedPostPhotoPublicId(url, accountId) {
+  return extractPublicId(url, env.cloudinary?.cloudName, postFolder(accountId));
+}
+
+export async function destroyImage(publicId) {
   if (!env.cloudinary) return false;
 
   const { cloudName, apiKey, apiSecret, apiBaseUrl } = env.cloudinary;

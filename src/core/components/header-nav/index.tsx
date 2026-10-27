@@ -6,9 +6,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { HeaderNavProps } from './type';
 
 const BUTTON_SIZE = 35;
-const GAP = 12;
+const GAP = 10;
 
-export function HeaderNav({ items }: HeaderNavProps) {
+const BADGE_MAX = 9;
+
+export function HeaderNav({ items, badges }: HeaderNavProps) {
   const pathname = usePathname();
   const activeIndex = items.findIndex((item) => item.href === pathname);
   const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -50,12 +52,13 @@ export function HeaderNav({ items }: HeaderNavProps) {
 
       {items.map(({ href, label, icon: Icon }, index) => {
         const isActive = index === activeIndex;
+        const badgeCount = badges?.[href] ?? 0;
 
         return (
           <Link
             key={href}
             href={href}
-            aria-label={label}
+            aria-label={badgeCount > 0 ? `${label} (${badgeCount} novas)` : label}
             aria-current={isActive ? 'page' : undefined}
             className={`relative z-10 flex items-center rounded-full transition-colors duration-300 motion-reduce:transition-none ${
               isActive ? 'text-white' : 'hover:opacity-80'
@@ -80,6 +83,14 @@ export function HeaderNav({ items }: HeaderNavProps) {
                 {label}
               </span>
             </span>
+            {badgeCount > 0 &&
+              (isActive ? (
+                <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-rose-500 px-1 text-center text-[10px] font-bold leading-4 text-white">
+                  {badgeCount > BADGE_MAX ? `${BADGE_MAX}+` : badgeCount}
+                </span>
+              ) : (
+                <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-rose-500" />
+              ))}
           </Link>
         );
       })}

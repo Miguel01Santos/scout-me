@@ -8,6 +8,16 @@ import {
   listFollowRequests,
 } from '../follow/service.js';
 import { AccountType, FREE_ACCOUNT_TYPES, USERNAME_PATTERN } from './constants.js';
+import { countClubAthletes, findActiveClub } from '../club/queries.js';
+import { CLUB_MEMBER_TYPES, CLUB_TYPE } from '../club/constants.js';
+import { NotificationTitle } from '../notification/constants.js';
+import { countUnreadNotifications, createNotification } from '../notification/service.js';
+import {
+  countPendingRatings,
+  defaultRatingScore,
+  getRatingSummary,
+  publishPendingRatings,
+} from '../rating/score.js';
 import { toPublicConfiguration, toPublicPlayerAttributes, toPublicProfile } from './mappers.js';
 
 const UNIQUE_CONSTRAINT_ERROR = 'P2002';
@@ -55,13 +65,26 @@ export async function findAccountByUsername(username) {
 
 export async function getAccount(userId) {
   const account = await findAccountByUserId(userId);
-  const [configuration, follows] = await Promise.all([
+  const [
+    configuration,
+    follows,
+    ratings,
+    unreadNotificationsCount,
+    pendingRatingsCount,
+    club,
+    athletesCount,
+  ] = await Promise.all([
     prismaClient.configuration.upsert({
       where: { accountId: account.id },
       update: {},
       create: { accountId: account.id },
     }),
     countFollows(account.id),
+    getRatingSummary(account),
+    countUnreadNotifications(account.id),
+    countPendingRatings(account.id),
+    CLUB_MEMBER_TYPES.includes(account.type) ? findActiveClub(account.id) : null,
+    account.type === CLUB_TYPE ? countClubAthletes(account.id) : null,
   ]);
 
   return {
@@ -69,12 +92,18 @@ export async function getAccount(userId) {
     username: account.username,
     type: account.type,
     isPrivate: account.isPrivate,
+    reviewRatings: account.reviewRatings,
     configuration: toPublicConfiguration(configuration),
     profile: toPublicProfile(account.profile, account.user.avatarUrl),
     // Só existe para Player; nos outros tipos vem null.
     playerAttributes:
       account.type === AccountType.PLAYER ? toPublicPlayerAttributes(account.playerAttributes) : null,
     ...follows,
+    ...ratings,
+    unreadNotificationsCount,
+    pendingRatingsCount,
+    club,
+    athletesCount,
   };
 }
 
@@ -108,15 +137,22 @@ export async function chooseAccountType(userId, { type }) {
     throw new HttpError(403, 'Esse tipo de conta é pago e ainda não está disponível');
   }
 
-  // O filtro por tipo vazio impede que dois pedidos ao mesmo tempo gravem tipos diferentes.
-  const { count } = await prismaClient.account.updateMany({
-    where: { id: account.id, type: null },
-    data: { type, updatedAt: new Date() },
-  });
+  await prismaClient.$transaction(async (transaction) => {
+    // O filtro por tipo vazio impede que dois pedidos ao mesmo tempo gravem tipos diferentes.
+    const { count } = await transaction.account.updateMany({
+      where: { id: account.id, type: null },
+      data: { type, ratingScore: defaultRatingScore(type), updatedAt: new Date() },
+    });
 
-  if (count === 0) {
-    throw new HttpError(409, 'O tipo da conta já foi escolhido');
-  }
+    if (count === 0) {
+      throw new HttpError(409, 'O tipo da conta já foi escolhido');
+    }
+
+    await createNotification(
+      { userReceivesNotification: account.id, title: NotificationTitle.WELCOME },
+      transaction
+    );
+  });
 
   return getAccount(userId);
 }
@@ -136,6 +172,10 @@ export async function updateConfiguration(userId, data) {
 export async function updateAccount(userId, data) {
   const account = await findAccountByUserId(userId);
 
+  if (data.reviewRatings !== undefined && account.type !== AccountType.PLAYER) {
+    throw new HttpError(403, 'Aprovar avaliações é só para contas Player');
+  }
+
   await prismaClient.$transaction(async (transaction) => {
     await transaction.account.update({
       where: { id: account.id },
@@ -143,6 +183,7 @@ export async function updateAccount(userId, data) {
     });
 
     if (data.isPrivate === false) await acceptAllFollowRequests(account.id, transaction);
+    if (data.reviewRatings === false) await publishPendingRatings(account, transaction);
   });
 
   return getAccount(userId);
@@ -194,7 +235,17 @@ export async function acceptFollowRequestFrom(userId, followerUsername) {
     findAccountByUsername(followerUsername),
   ]);
 
-  await acceptFollowRequest(account.id, follower.id);
+  await prismaClient.$transaction(async (transaction) => {
+    await acceptFollowRequest(account.id, follower.id, transaction);
+    await createNotification(
+      {
+        userGeneratorNotification: account.id,
+        userReceivesNotification: follower.id,
+        title: NotificationTitle.ACCEPTED_REQUEST_FOLLOW,
+      },
+      transaction
+    );
+  });
 
   return getAccount(userId);
 }

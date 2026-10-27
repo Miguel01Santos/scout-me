@@ -8,6 +8,7 @@ import { toPublicUser } from '../user/service.js';
 import { AccountType } from '../account/constants.js';
 import { createSession, revokeSession, rotateSession } from '../session/service.js';
 import { generateUniqueUsername } from '../account/username.js';
+import { defaultRatingScore } from '../rating/score.js';
 
 const PASSWORD_SALT_ROUNDS = 10;
 const EMAIL_TAKEN_MESSAGE = 'Já existe um usuário com esse e-mail';
@@ -113,6 +114,7 @@ export async function loginDevUser() {
           create: {
             username: await generateUniqueUsername('Dev Local'),
             type: AccountType.PLAYER,
+            ratingScore: defaultRatingScore(AccountType.PLAYER),
             configuration: { create: {} },
           },
         },

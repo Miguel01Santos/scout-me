@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from '@heroui/react';
-import { House, Search, Send } from 'lucide-react';
+import { Bell, House, Search, Send } from 'lucide-react';
 import { useSession } from '../../auth/use-session';
 import { useThemeClasses } from '../../hooks/use-theme-classes';
 import { AvatarComponent } from '../../library/avatar';
@@ -9,10 +9,13 @@ import { useAccount } from '../../providers/account';
 import { HeaderNav } from '../header-nav';
 import { HeaderNavItem } from '../header-nav/type';
 
+const NOTIFICATIONS_HREF = '/notificacoes';
+
 const NAV_ITEMS: HeaderNavItem[] = [
   { href: '/home', label: 'Home', icon: House },
   { href: '/enviar', label: 'Mensagens', icon: Send },
   { href: '/buscar', label: 'Descobrir', icon: Search },
+  { href: NOTIFICATIONS_HREF, label: 'Notificações', icon: Bell },
 ];
 
 export function Header() {
@@ -21,7 +24,7 @@ export function Header() {
   const themeClasses = useThemeClasses();
 
   return (
-    <div className="flex items-center gap-5">
+    <div className="flex items-center gap-4">
       {/* Espera a conta também: a cor do anel depende do tipo, e sem ele piscaria a cor errada. */}
       {user && !isLoading ? (
         <AvatarComponent
@@ -35,7 +38,10 @@ export function Header() {
 
       <div aria-hidden className={`h-5 w-px ${themeClasses.divider}`} />
 
-      <HeaderNav items={NAV_ITEMS} />
+      <HeaderNav
+        items={NAV_ITEMS}
+        badges={{ [NOTIFICATIONS_HREF]: account?.unreadNotificationsCount ?? 0 }}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { ProfileCard } from '@/src/core/api/profiles/type';
 import { AccountType } from '@/src/core/enums/account-type';
 import { AvatarColor } from '@/src/core/enums/avatar-color';
 
@@ -11,6 +12,11 @@ export interface ProfileViewData {
   followersCount: number;
   followingCount: number;
   bio: string | null;
+  ratingScore: number;
+  ratingsCount: number;
+  club: ProfileCard | null;
+  athletesCount: number | null;
+  followsHref?: string;
 }
 
 export interface ProfileViewProps {

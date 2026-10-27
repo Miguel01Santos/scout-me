@@ -1,4 +1,6 @@
+export type HomeScreen = 'ranking' | 'comparar' | 'feed';
+
 export interface NaviBarProps {
-  screen: string;
-  setCurrentScreen: (screen: string) => void;
+  screen: HomeScreen;
+  setCurrentScreen: (screen: HomeScreen) => void;
 }

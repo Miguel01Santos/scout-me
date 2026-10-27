@@ -35,3 +35,9 @@ export function toProfileCard(account) {
     avatarColor: account.profile?.avatarColor ?? null,
   };
 }
+
+export function toDisplayName(account) {
+  const profile = account.profile;
+
+  return profile?.displayName && profile.showDisplayName ? profile.displayName : account.user.name;
+}

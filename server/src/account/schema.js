@@ -35,9 +35,13 @@ export const updatePlayerAttributesSchema = z
   })
   .strict();
 
-export const updateAccountSchema = z.object({
-  isPrivate: z.boolean('Valor inválido'),
-});
+export const updateAccountSchema = z
+  .object({
+    isPrivate: z.boolean('Valor inválido').optional(),
+    reviewRatings: z.boolean('Valor inválido').optional(),
+  })
+  .strict()
+  .refine((data) => Object.keys(data).length > 0, 'Informe o que quer alterar');
 
 export const updateProfileSchema = z.object({
   username: usernameSchema.optional(),
